@@ -6,16 +6,16 @@ type CommandCollection = Record<string, Command>;
 
 export class CliApplication {
   constructor(
-    private readonly _defaultCommand: string = Commands.help
+    private readonly command: string = Commands.help
   ) {}
 
   private commands: CommandCollection = {};
 
   private get defaultCommand(): Command | never {
-    if (! this.commands[this._defaultCommand]) {
-      throw new Error(`The default command (${this._defaultCommand}) is not registered.`);
+    if (! this.commands[this.command]) {
+      throw new Error(`The default command (${this.command}) is not registered.`);
     }
-    return this.commands[this._defaultCommand];
+    return this.commands[this.command];
   }
 
   private getCommand(name: string): Command {
