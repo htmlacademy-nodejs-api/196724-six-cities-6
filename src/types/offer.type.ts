@@ -1,7 +1,7 @@
-import {City} from './city.enums';
-import {PropertyType} from './property-type.enums';
-import {Location} from './location.type';
-import {Facility} from './facility.enums';
+import {City} from './city.enums.js';
+import {PropertyType} from './property-type.enums.js';
+import {Location} from './location.type.js';
+import {Facility} from './facility.enums.js';
 
 export type Offer = {
   name: string;
