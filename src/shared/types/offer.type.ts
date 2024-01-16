@@ -6,9 +6,10 @@ import {Facility} from './facility.enums.js';
 export type Offer = {
   name: string;
   description: string;
-  postDate: string;
+  postDate: Date;
   city: City;
-  preview_url: string;
+  price: number;
+  previewUrl: string;
   urls: string[];
   isPremium: boolean;
   isFavourite: boolean;

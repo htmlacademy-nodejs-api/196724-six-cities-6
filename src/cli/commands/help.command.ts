@@ -1,5 +1,5 @@
 import { Command } from './command.interface.js';
-import {Commands} from './commands.enums.js';
+import { Commands } from './commands.enums.js';
 
 export class HelpCommand implements Command {
   public getName(): string {

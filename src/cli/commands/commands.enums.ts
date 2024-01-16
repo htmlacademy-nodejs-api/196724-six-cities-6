@@ -1,3 +1,5 @@
 export enum Commands {
-  help = '--help'
+  help = '--help',
+  version = '--version',
+  import = '--import',
 }
