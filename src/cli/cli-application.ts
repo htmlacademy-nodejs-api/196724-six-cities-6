@@ -2,14 +2,9 @@ import {Command} from './commands/command.interface.js';
 import {CommandParser} from './command-parser.js';
 import {Commands} from './commands/commands.enums.js';
 
-type CommandCollection = Record<string, Command>;
-
 export class CliApplication {
-  constructor(
-    private readonly command: string = Commands.help
-  ) {}
-
-  private commands: CommandCollection = {};
+  private readonly command: string = Commands.help;
+  private commands: Record<string, Command> = {};
 
   private get defaultCommand(): Command | never {
     if (! this.commands[this.command]) {
@@ -24,10 +19,11 @@ export class CliApplication {
 
   public registerCommands(commandList: Command[]): void {
     commandList.forEach((command) => {
-      if (Object.hasOwn(this.commands, command.getName())) {
-        throw new Error(`Command ${command.getName()} is already registered.`);
+      const name: string = command.getName();
+      if (this.commands[name]) {
+        throw new Error(`Command ${name} is already registered.`);
       }
-      this.commands[command.getName()] = command;
+      this.commands[name] = command;
     });
   }
 
