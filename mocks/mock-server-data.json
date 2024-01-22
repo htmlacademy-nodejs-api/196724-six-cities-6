@@ -1,0 +1,67 @@
+{
+  "api": {
+    "names": [
+      "Lakeview Colonial Motel",
+      "Downtowner Hotel",
+      "Snooze Lodge",
+      "Vagabond Cabin",
+      "Voltage Hotel",
+      "Raspberry Hotel"
+    ],
+    "descriptions": [
+      "Hotel is located near Tiantan Park, just a 10-minute walk from the National Center for the Performing Arts and Tian'anmen Square.",
+      "Hotel offers ultimate comfort and luxury. This 4-storied hotel is a beautiful combination of traditional grandeur and modern facilities.",
+      "Vela is located in beautiful Monteverde, famous for its rare and gorgeous cloud forest and friendly community.",
+      "Comfortable rooms and suites overlook lush gardens with panoramic views of the Arenal Volcano.",
+      "Each of the 210 modern guest rooms have wireless internet and satellite TV.",
+      "A private bathroom with shower, a TV, and free tea and coffee facilities are provided in each bright room."
+    ],
+    "dates": [
+      "2019-05-03T22:06:56+11:00",
+      "2019-12-31T06:56:09+11:00",
+      "2019-03-09T05:07:59+11:00",
+      "2019-03-24T09:24:42+11:00",
+      "2019-01-08T03:23:31+11:00",
+      "2019-01-08T005:23:31+11:00"
+    ],
+    "cities": [
+      "Paris",
+      "Cologne",
+      "Brussels",
+      "Amsterdam",
+      "Hamburg",
+      "Dusseldorf"
+    ],
+    "urls": [
+      "https://picsum.photos/200",
+      "https://picsum.photos/id/237/200/300",
+      "https://picsum.photos/seed/picsum/200/300",
+      "https://picsum.photos/200/300?grayscale",
+      "https://picsum.photos/200/300/?blur",
+      "https://picsum.photos/200/300.jpg"
+    ],
+    "types": [
+      "apartment",
+      "house",
+      "room",
+      "hotel"
+    ],
+    "facilities": [
+      "Breakfast",
+      "Air conditioning",
+      "Laptop friendly workspace",
+      "Baby seat",
+      "Washer",
+      "Towels",
+      "Fridge"
+    ],
+    "creators": [
+      "Ilya Suglobov",
+      "Tom Kitch",
+      "Luke Devidson",
+      "Damian Kennedy",
+      "Ivan Suglobov",
+      "Boris Smith"
+    ]
+  }
+}
