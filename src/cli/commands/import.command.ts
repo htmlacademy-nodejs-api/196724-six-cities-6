@@ -1,9 +1,8 @@
 import { Command } from './command.interface.js';
 import { TSVFileReader } from '../../shared/libs/file-reader/index.js';
-import { logError, mapToOffer } from '../../shared/utils/index.js';
+import { logError, logInfo, mapToOffer } from '../../shared/utils/index.js';
 import { Commands } from './commands.enums.js';
 import { Events, Offer } from '../../shared/types/index.js';
-import Chalk from 'chalk';
 
 export class ImportCommand implements Command {
   private offers: Offer[] = [];
@@ -18,7 +17,7 @@ export class ImportCommand implements Command {
 
   private onCompleteImport = () => {
     console.info(this.offers);
-    console.info(Chalk.blue(`💪 ${this.offers.length} rows imported.`));
+    logInfo(`${this.offers.length} rows imported.`);
   };
 
   public async execute(...parameters: string[]): Promise<void> {
@@ -34,8 +33,8 @@ export class ImportCommand implements Command {
       try {
         await fileReader.read();
       } catch (error) {
-        console.error(`Can't import data from file: ${filename}`);
-        console.error(logError(error));
+        logError(`Can't import data from file: ${filename}`);
+        logError(error);
       }
     }
   }
