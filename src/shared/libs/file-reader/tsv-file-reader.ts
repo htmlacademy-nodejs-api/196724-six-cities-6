@@ -3,7 +3,7 @@ import { createReadStream } from 'node:fs';
 import EventEmitter from 'node:events';
 import { Events } from '../../types/index.js';
 
-const MIN_CHUNK_SIZE = 384;
+const MIN_CHUNK_SIZE = 16384;
 export class TSVFileReader extends EventEmitter implements FileReader {
   constructor(
     private readonly filename: string
@@ -18,10 +18,10 @@ export class TSVFileReader extends EventEmitter implements FileReader {
     });
 
     let remainingData = '';
-    let nextLinePosition = -1;
+    let nextLinePosition = 0;
 
     for await (const chunk of readStream) {
-      remainingData += chunk.toString();
+      remainingData += chunk;
       while ((nextLinePosition = remainingData.indexOf('\n')) >= 0) {
         const completeRow = remainingData.slice(0, nextLinePosition + 1);
         remainingData = remainingData.slice(++nextLinePosition);

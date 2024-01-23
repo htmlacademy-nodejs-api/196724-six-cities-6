@@ -3,6 +3,7 @@ import { TSVFileReader } from '../../shared/libs/file-reader/index.js';
 import { logError, mapToOffer } from '../../shared/utils/index.js';
 import { Commands } from './commands.enums.js';
 import { Events, Offer } from '../../shared/types/index.js';
+import Chalk from 'chalk';
 
 export class ImportCommand implements Command {
   private offers: Offer[] = [];
@@ -17,7 +18,7 @@ export class ImportCommand implements Command {
 
   private onCompleteImport = () => {
     console.info(this.offers);
-    console.info(`${this.offers.length} rows imported.`);
+    console.info(Chalk.blue(`💪 ${this.offers.length} rows imported.`));
   };
 
   public async execute(...parameters: string[]): Promise<void> {

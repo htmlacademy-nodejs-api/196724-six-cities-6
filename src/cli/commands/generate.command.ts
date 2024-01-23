@@ -5,7 +5,7 @@ import { MockedOffers } from '../../shared/types/index.js';
 import { TsvOfferGenerator } from '../../shared/libs/offers-generator/index.js';
 import { logError } from '../../shared/utils/index.js';
 import { TSVFileWriter } from '../../shared/libs/file-writer/index.js';
-
+import Chalk from 'chalk';
 
 export class GenerateCommand implements Command {
   private mockedOffers: MockedOffers | undefined = undefined;
@@ -45,7 +45,7 @@ export class GenerateCommand implements Command {
       try {
         await this.fetch(url);
         await this.write(filepath, offersCount);
-        console.info(`File ${filepath} was created!`);
+        console.info(Chalk.blue(`💪 File ${filepath} was created!`));
       } catch (error: unknown) {
         console.error('Can\'t generate data');
         console.error(logError(error));
