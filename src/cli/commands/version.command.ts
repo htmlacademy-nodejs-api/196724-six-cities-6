@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { Command } from './command.interface.js';
 import { Commands } from './commands.enums.js';
 import Chalk from 'chalk';
+import { logError } from '../../shared/utils/index.js';
 
 type PackageJSONConfig = {
   version: string;
@@ -40,10 +41,7 @@ export class VersionCommand implements Command {
       console.info(`${Chalk.yellow('⚠️ Текущая версия:')} ${version}'`);
     } catch (error: unknown) {
       console.error(`Failed to read version from ${this.filePath}`);
-
-      if (error instanceof Error) {
-        console.error(error.message);
-      }
+      logError(error);
     }
   }
 }
