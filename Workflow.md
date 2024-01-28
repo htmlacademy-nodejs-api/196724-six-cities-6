@@ -63,9 +63,14 @@ npm run ts -- <Путь к модулю с ts-кодом>
 ```bash
 npm start
 ```
-
 В процессе запуска проекта будет выполнен процесс «Сборки проекта» и запуска результирующего кода.
 
+#### Run JSON server
+It allows running a local JSON server with mocked data located in `mokes/mock-server-data.json`.
+
+```bash
+npm run-json-server
+```
 ## Структура проекта
 
 ### Директория `src`
