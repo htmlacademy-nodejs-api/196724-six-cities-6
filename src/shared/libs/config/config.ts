@@ -1,9 +1,10 @@
 import { IConfig } from './config.interface.js';
 import { config } from 'dotenv';
 import { Logger} from '../logger/index.js';
-import { configRestSchema, ApplicationSchema } from './schema.js';
+import { configApplicationSchema } from './application-schema.js';
 import { inject, injectable } from 'inversify';
 import { Components } from '../../types/index.js';
+import { ApplicationSchema } from './application-schema.type.js';
 
 @injectable()
 export class Config implements IConfig<ApplicationSchema> {
@@ -17,10 +18,10 @@ export class Config implements IConfig<ApplicationSchema> {
       throw Error('Cannot find or read .env file!');
     }
 
-    configRestSchema.load(parsed);
-    configRestSchema.validate({ allowed: 'strict', output: this.logger.info });
+    configApplicationSchema.load(parsed);
+    configApplicationSchema.validate({ allowed: 'strict', output: this.logger.info });
 
-    this.config = configRestSchema.getProperties();
+    this.config = configApplicationSchema.getProperties();
     this.logger.info('.env file found and successfully parsed!');
   }
 

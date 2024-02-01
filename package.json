@@ -9,7 +9,6 @@
   ],
   "main": "main.js",
   "scripts": {
-    "start": "npm run build && node ./dist/main.js",
     "build": "npm run clean && npm run compile",
     "lint": "eslint src/ --ext .ts",
     "compile": "tsc -p tsconfig.json",
@@ -18,8 +17,8 @@
     "cli-import": "ts-node ./src/main.cli.ts --import ./mocks/offers.tsv",
     "cli-generate": "ts-node ./src/main.cli.ts --generate 10 ./mocks/offers.tsv http://localhost:4000/api",
     "run-json-server": "json-server mocks/mock-server-data.json",
-    "application": "ts-node ./src/main.application.ts",
-    "application-with-pretty": "ts-node ./src/main.application.ts | pino-pretty --colorize --translateTime"
+    "start": "npm run build && node ./dist/main.application.js",
+    "start:dev": "npm run ts ./src/main.application.ts | pino-pretty --colorize --translateTime SYS:standard"
   },
   "devDependencies": {
     "@types/convict": "^6.1.4",
@@ -34,12 +33,12 @@
     "pino-pretty": "^10.2.0",
     "rimraf": "5.0.1",
     "ts-node": "10.9.1",
-    "tslib": "^2.6.2",
+    "tslib": "2.6.2",
     "typescript": "5.2.2"
   },
   "type": "module",
   "engines": {
-    "node": "^18.0.0",
+    "node": "^19.0.0",
     "npm": ">=8"
   },
   "dependencies": {
