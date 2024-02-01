@@ -14,7 +14,7 @@ export class InversifyContainer extends Container implements IInversifyContainer
   }
 
   public get application() {
-    if(this.isBound(Components.Application)) {
+    if (this.isBound(Components.Application)) {
       return this.get<IApplication>(Components.Application);
     }
     throw Error('Application container has not been bound!');

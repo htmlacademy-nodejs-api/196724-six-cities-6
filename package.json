@@ -18,7 +18,8 @@
     "cli-generate": "ts-node ./src/main.cli.ts --generate 10 ./mocks/offers.tsv http://localhost:4000/api",
     "run-json-server": "json-server mocks/mock-server-data.json",
     "start": "npm run build && node ./dist/main.application.js",
-    "start:dev": "npm run ts ./src/main.application.ts | pino-pretty --colorize --translateTime SYS:standard"
+    "start:dev": "npm run ts ./src/main.application.ts | pino-pretty --colorize --translateTime SYS:standard",
+    "docker-mongo": "docker compose --file ./docker-compose.dev.yml --env-file ./.env --project-name six-cities up -d"
   },
   "devDependencies": {
     "@types/convict": "^6.1.4",
