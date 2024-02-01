@@ -9,7 +9,6 @@
   ],
   "main": "main.js",
   "scripts": {
-    "start": "npm run build && node ./dist/main.js",
     "build": "npm run clean && npm run compile",
     "lint": "eslint src/ --ext .ts",
     "compile": "tsc -p tsconfig.json",
@@ -17,26 +16,39 @@
     "ts": "ts-node",
     "cli-import": "ts-node ./src/main.cli.ts --import ./mocks/offers.tsv",
     "cli-generate": "ts-node ./src/main.cli.ts --generate 10 ./mocks/offers.tsv http://localhost:4000/api",
-    "run-json-server": "json-server mocks/mock-server-data.json"
+    "run-json-server": "json-server mocks/mock-server-data.json",
+    "start": "npm run build && node ./dist/main.application.js",
+    "start:dev": "npm run ts ./src/main.application.ts | pino-pretty --colorize --translateTime SYS:standard"
   },
   "devDependencies": {
+    "@types/convict": "^6.1.4",
+    "@types/convict-format-with-validator": "^6.0.3",
     "@types/luxon": "^3.4.2",
     "@types/node": "18.17.17",
     "@typescript-eslint/eslint-plugin": "6.7.0",
     "@typescript-eslint/parser": "6.7.0",
-    "axios": "^1.6.5",
     "eslint": "8.49.0",
     "eslint-config-htmlacademy": "9.1.1",
     "json-server": "^0.17.4",
-    "luxon": "^3.4.4",
+    "pino-pretty": "^10.2.0",
     "rimraf": "5.0.1",
     "ts-node": "10.9.1",
-    "tslib": "^2.6.2",
+    "tslib": "2.6.2",
     "typescript": "5.2.2"
   },
   "type": "module",
   "engines": {
-    "node": "^18.0.0",
+    "node": "^19.0.0",
     "npm": ">=8"
+  },
+  "dependencies": {
+    "axios": "^1.6.7",
+    "convict": "^6.2.4",
+    "convict-format-with-validator": "^6.2.0",
+    "dotenv": "^16.3.1",
+    "inversify": "^6.0.1",
+    "luxon": "^3.4.4",
+    "pino": "^8.15.1",
+    "reflect-metadata": "^0.1.13"
   }
 }
