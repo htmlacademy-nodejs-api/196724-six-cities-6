@@ -1,8 +1,19 @@
-import {Command} from './commands/command.interface.js';
-import {CommandParser} from './command-parser.js';
-import {Commands} from './commands/commands.enums.js';
+import { Command } from './commands/command.interface.js';
+import { CommandParser } from './command-parser.js';
+import { Commands } from './commands/commands.enums.js';
+import { ICliApplication } from './cli-application.interface.js';
+import { inject, injectable } from 'inversify';
+import { Components } from '../shared/types/index.js';
 
-export class CliApplication {
+@injectable()
+export class CliApplication implements ICliApplication {
+  constructor(
+    @inject(Components.VersionCommand) private readonly versionCommand: Command,
+    @inject(Components.HelpCommand) private readonly helpCommand: Command,
+    @inject(Components.ImportCommand) private readonly importCommand: Command,
+    @inject(Components.GenerateCommand) private readonly generateCommand: Command
+  ) {}
+
   private readonly command: string = Commands.help;
   private commands: Record<string, Command> = {};
 
@@ -13,11 +24,12 @@ export class CliApplication {
     return this.commands[this.command];
   }
 
-  private getCommand(name: string): Command {
+  public getCommand(name: string): Command {
     return this.commands[name] ?? this.defaultCommand;
   }
 
-  public registerCommands(commandList: Command[]): void {
+  public registerCommands(): void {
+    const commandList: Command[] = [this.versionCommand, this.generateCommand, this.helpCommand, this.importCommand];
     commandList.forEach((command) => {
       const name: string = command.getName();
       if (this.commands[name]) {

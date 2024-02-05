@@ -1,3 +1,3 @@
 export interface IInversifyContainer {
-  initMainApplicationContainers: () => void
+  initMainApplication: () => void
 }

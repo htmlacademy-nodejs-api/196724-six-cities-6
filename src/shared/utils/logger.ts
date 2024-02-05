@@ -8,4 +8,4 @@ export const logError = (error: unknown) => {
 };
 
 
-export const logInfo = (text: string) => console.info(Chalk.blue(`💪 ${text}`));
+export const logInfo = (text: string, ...args: unknown[]) => console.info(Chalk.blue(`💪 ${text}`,args));
