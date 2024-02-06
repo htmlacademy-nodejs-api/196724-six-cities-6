@@ -1,7 +1,7 @@
 import { User, UserType } from '../../types/index.js';
 import { getModelForClass, prop, modelOptions } from '@typegoose/typegoose';
 import { getGeneratedSHA256 } from '../../utils/index.js';
-import {BaseDocument} from '../base-document.js';
+import { BaseDocument } from '../base-document.js';
 
 const VALIDATE_EMAIL_REG_EX = /^([\w-\\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
 
@@ -28,9 +28,6 @@ export class UserEntity extends BaseDocument {
   @prop({ required: true, unique: true, validate: [VALIDATE_EMAIL_REG_EX, 'Email is incorrect'] })
   public email: string;
 
-  // ⚠️ Question. I wanted to add - `maxlength: 12` validation rule (based on the project specification)
-  // but hashed password length is longer than 12 of course. I could not find a way of transformation
-  // of a value after validation before saving. It can be done manually however I thought there is a more elegant way with @typegoose.
   @prop({ required: true, minlength: 6 })
   public password: string;
 
