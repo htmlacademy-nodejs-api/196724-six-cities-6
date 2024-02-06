@@ -2,25 +2,25 @@ import { Command } from './command.interface.js';
 import { TSVFileReader } from '../../shared/libs/file-reader/index.js';
 import { getMongoUrl, mapToOffer } from '../../shared/utils/index.js';
 import { Commands } from './commands.enums.js';
-import { Components, Events, Offer } from '../../shared/types/index.js';
-import { inject, injectable } from 'inversify';
-import { ILogger } from '../../shared/libs/logger/index.js';
-import { ApplicationSchema, IConfig } from '../../shared/libs/config/index.js';
-import { IDatabaseClient } from '../../shared/libs/database-client/index.js';
-import { IUserService } from '../../shared/modules/user/index.js';
-import { IOfferService } from '../../shared/modules/offer/index.js';
+import { Events, Offer } from '../../shared/types/index.js';
+import { injectable } from 'inversify';
+import { DatabaseClient } from '../../shared/libs/database-client/index.js';
+import { UserModel, UserService} from '../../shared/modules/user/index.js';
+import { OfferModel, OfferService} from '../../shared/modules/offer/index.js';
+import { ConsoleLogger } from '../../shared/libs/logger/console.logger.js';
+import { Logger} from '../../shared/libs/logger/index.js';
 
 @injectable()
 export class ImportCommand implements Command {
-  constructor(
-    @inject(Components.ConsoleLogger) private readonly logger: ILogger,
-    @inject(Components.Config) private readonly config: IConfig<ApplicationSchema>,
-    @inject(Components.DatabaseClient) private readonly databaseClient: IDatabaseClient,
-    @inject(Components.UserService) private readonly userService: IUserService,
-    @inject(Components.OfferService) private readonly offerService: IOfferService
-  ) {}
-
   private offersCount: number = 0;
+
+  private consoleLogger: ConsoleLogger = new ConsoleLogger();
+  private logger: ConsoleLogger = new Logger();
+  private userService: UserService = new UserService(UserModel, this.logger);
+  private offerService: OfferService = new OfferService(OfferModel, this.logger);
+  private databaseClient: DatabaseClient = new DatabaseClient(this.logger);
+
+
   public getName(): string {
     return Commands.import;
   }
@@ -32,7 +32,7 @@ export class ImportCommand implements Command {
   };
 
   private onCompleteImport = async (): Promise<void> => {
-    this.logger.info(`${this.offersCount} rows imported.`);
+    this.consoleLogger.info(`${this.offersCount} rows imported.`);
     await this.databaseClient.disconnect();
   };
 
@@ -44,24 +44,24 @@ export class ImportCommand implements Command {
         await this.offerService.create(offer);
         this.offersCount += 1;
       } catch (error) {
-        this.logger.error('Can not create an offer', error as Error);
+        this.consoleLogger.error('Can not create an offer', error as Error);
       }
 
     }
   }
 
   public async execute(...parameters: string[]): Promise<void> {
-    const [filename] = parameters;
-    if (!filename) {
-      throw Error('Filename have not been passed!');
+    const [filename, username, password, host, port, databaseName] = parameters;
+    if (!filename || !username || !password || !host || !port || !databaseName) {
+      throw Error('One of required arguments has not been passed! Please run --help command for instructions.');
     } else {
 
       const url = getMongoUrl({
-        username: this.config.get('DB_USER'),
-        password: this.config.get('DB_PASSWORD'),
-        host: this.config.get('DB_HOST'),
-        port: this.config.get('DB_PORT'),
-        databaseName: this.config.get('DB_NAME')
+        username,
+        password,
+        host,
+        port,
+        databaseName
       });
       await this.databaseClient.connect(url);
 
@@ -73,7 +73,7 @@ export class ImportCommand implements Command {
       try {
         await fileReader.read();
       } catch (error) {
-        this.logger.error(`Can't import data from file: ${filename}`, error as Error);
+        this.consoleLogger.error(`Can't import data from file: ${filename}`, error as Error);
       }
     }
   }

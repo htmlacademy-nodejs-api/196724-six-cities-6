@@ -4,25 +4,19 @@ import { UserEntity } from './user.entity.js';
 import { IUserService } from './user-service.interface.js';
 import { inject, injectable } from 'inversify';
 import { Components } from '../../types/index.js';
-import { Logger } from '../../libs/logger/index.js';
-import { ApplicationSchema, IConfig } from '../../libs/config/index.js';
+import { ILogger } from '../../libs/logger/index.js';
 
 @injectable()
 export class UserService implements IUserService {
   constructor(
-    @inject(Components.Logger) private readonly logger: Logger,
     @inject(Components.UserModel) private readonly userModel: types.ModelType<UserEntity>,
-    @inject(Components.Config) private readonly config: IConfig<ApplicationSchema>
+    @inject(Components.Logger) private readonly logger: ILogger
   ) {}
 
-  get salt() {
-    return this.config.get('SALT');
-  }
-
-  public async create(dto: CreateUserDto): Promise<DocumentType<UserEntity>> {
+  public async create(dto: CreateUserDto, salt: string | undefined): Promise<DocumentType<UserEntity>> {
     const user = new UserEntity(dto);
-    if (this.salt) {
-      user.setPassword(this.salt);
+    if (salt) {
+      user.setPassword(salt);
       const result = this.userModel.create(user);
       this.logger.info(`New user created: ${user.email}`);
       return result;

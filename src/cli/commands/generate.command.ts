@@ -9,8 +9,9 @@ import { ILogger } from '../../shared/libs/logger/index.js';
 
 @injectable()
 export class GenerateCommand implements Command {
-  constructor(@inject(Components.ConsoleLogger) private readonly logger: ILogger,) {
-  }
+  constructor(
+    @inject(Components.ConsoleLogger) private readonly logger: ILogger
+  ) {}
 
   private mockedOffers: MockedOffers | undefined = undefined;
 

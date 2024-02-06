@@ -2,7 +2,7 @@ import * as Mongoose from 'mongoose';
 import { inject, injectable } from 'inversify';
 import { IDatabaseClient } from './database-client.interface.js';
 import { Components } from '../../types/index.js';
-import { Logger } from '../logger/index.js';
+import { ILogger } from '../logger/index.js';
 
 const MAX_CONNECTING: number = 1;
 const MAX_CONNECTING_TRIES: number = 3;
@@ -13,7 +13,7 @@ export class DatabaseClient implements IDatabaseClient {
   private mongoose: typeof Mongoose;
 
   constructor(
-    @inject(Components.Logger) private readonly logger: Logger
+    @inject(Components.Logger) private readonly logger: ILogger
   ) {}
 
   get isConnectedDatabase() {

@@ -21,8 +21,9 @@ function isPackageJSONConfig(value: unknown): value is PackageJSONConfig {
 
 @injectable()
 export class VersionCommand implements Command {
-  constructor(@inject(Components.ConsoleLogger) private readonly logger: ILogger) {
-  }
+  constructor(
+    @inject(Components.ConsoleLogger) private readonly logger: ILogger
+  ) {}
 
   private readonly filePath: string = './package.json';
   private readVersion(): string {

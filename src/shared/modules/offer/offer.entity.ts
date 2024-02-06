@@ -27,7 +27,7 @@ export class OfferEntity extends BaseDocument {
     this.guests = data.guests;
     this.facilities = data.facilities;
     // ⚠️ Question. I got an error ("Setting "Mixed" for property "OfferEntity.location"") regarding storing data as an object (Location is { long: string, lat: string }).
-    // Do you think is it fine to store it as setting instead?
+    // Do you think is it fine to store it as a string instead?
     this.location = JSON.stringify(data.location);
     this.commentsCount = data.commentsCount;
   }

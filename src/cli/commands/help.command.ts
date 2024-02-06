@@ -7,8 +7,9 @@ import { ILogger } from '../../shared/libs/logger/index.js';
 
 @injectable()
 export class HelpCommand implements Command {
-  constructor(@inject(Components.ConsoleLogger) private readonly logger: ILogger,) {
-  }
+  constructor(
+    @inject(Components.ConsoleLogger) private readonly logger: ILogger
+  ) {}
 
   public getName(): string {
     return Commands.help;
@@ -19,10 +20,10 @@ export class HelpCommand implements Command {
       ${Chalk.green('Программа для подготовки данных для REST API сервера.')}
       ${Chalk.blue('Пример:')} cli.js --<command> [--arguments]
       ${Chalk.blue('Команды:')}
-        --version:                        ✓ выводит номер версии
-        --help:                           ✓ печатает этот текст
-        --import <path>:                  ✓ импортирует данные из TSV
-        --generate <count> <path> <url>:  ✓ generate random offers data and write TSV file to /mocks
+        --version:                                                 ✓ выводит номер версии
+        --help:                                                    ✓ печатает этот текст
+        --import <path> <user> <password> <host> <port> <dbName>:  ✓ импортирует данные из TSV
+        --generate <count> <path> <url>:                           ✓ generate random offers data and write TSV file to /mocks
     `);
   }
 }

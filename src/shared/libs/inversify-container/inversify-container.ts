@@ -13,7 +13,8 @@ import { UserService } from '../../modules/user/index.js';
 import { ConsoleLogger } from '../logger/console.logger.js';
 import {
   CliApplication,
-  Command, GenerateCommand,
+  Command,
+  GenerateCommand,
   HelpCommand,
   ICliApplication,
   ImportCommand,
@@ -21,33 +22,33 @@ import {
 } from '../../../cli/index.js';
 
 export class InversifyContainer extends Container implements IInversifyContainer {
-  private initBaseComponents() {
-    this.bind<ILogger>(Components.Logger).to(Logger).inSingletonScope();
-    this.bind<IConfig<ApplicationSchema>>(Components.Config).to(Config).inSingletonScope();
-    this.bind<IDatabaseClient>(Components.DatabaseClient).to(DatabaseClient).inSingletonScope();
-    this.initEntities();
-  }
-
   public initMainApplication() {
     this.bind<IApplication>(Components.Application).to(Application).inSingletonScope();
-    this.initBaseComponents();
+    this.bind<ILogger>(Components.Logger).to(Logger).inSingletonScope();
+    this.bind<IConfig<ApplicationSchema>>(Components.Config).to(Config).inSingletonScope();
+    this.initDataBaseEntities();
   }
 
-  private initEntities() {
+  private initDataBaseEntities() {
+    this.bind<IDatabaseClient>(Components.DatabaseClient).to(DatabaseClient).inSingletonScope();
     this.bind<IUserService>(Components.UserService).to(UserService).inSingletonScope();
     this.bind<types.ModelType<UserEntity>>(Components.UserModel).toConstantValue(UserModel);
     this.bind<IOfferService>(Components.OfferService).to(OfferService).inSingletonScope();
     this.bind<types.ModelType<OfferEntity>>(Components.OfferModel).toConstantValue(OfferModel);
   }
 
-  public initCliApplication() {
-    this.bind<ICliApplication>(Components.CliApplication).to(CliApplication).inSingletonScope();
-    this.bind<ILogger>(Components.ConsoleLogger).to(ConsoleLogger).inSingletonScope();
+  private initCliCommands() {
     this.bind<Command>(Components.HelpCommand).to(HelpCommand).inSingletonScope();
     this.bind<Command>(Components.ImportCommand).to(ImportCommand).inSingletonScope();
     this.bind<Command>(Components.VersionCommand).to(VersionCommand).inSingletonScope();
     this.bind<Command>(Components.GenerateCommand).to(GenerateCommand).inSingletonScope();
-    this.initBaseComponents();
+  }
+
+  public initCliApplication() {
+    this.bind<ICliApplication>(Components.CliApplication).to(CliApplication).inSingletonScope();
+    this.bind<ILogger>(Components.ConsoleLogger).to(ConsoleLogger).inSingletonScope();
+    this.initCliCommands();
+    this.initDataBaseEntities();
   }
 
   public get application() {
