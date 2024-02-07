@@ -1,0 +1,268 @@
+openapi: 3.0.0
+info:
+  title: API server for "Six-cities" demo project.
+  description: |-
+    * List of server resources and endpoints.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 2.0.0
+tags:
+  - name: users
+    description: Users operations.
+  - name: offers
+    description: Offers operations.
+  - name: comments
+    description: Comments operations.
+paths:
+  /users/signup:
+    post:
+      tags:
+        - users
+      summary: A user sign-up.
+      description: A new user sign-up.
+      requestBody:
+        description: A user registration data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpUser'
+        required: true
+      responses:
+        "201":
+          description: A user registration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "400":
+          description: Not valid email or password.
+        "409":
+          description: User with this email already exists.
+
+  /users/signin:
+    post:
+      tags:
+        - users
+      summary: A user sign-in.
+      description: A user sign-in.
+      requestBody:
+        description: A user logging data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SingInUser'
+        required: true
+      responses:
+        "200":
+          description: A user logging succeed.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: aec6e133-49f6-43e6-84ed-f2a8f011d9b3
+        "400":
+          description: Not valid email or password.
+        "404":
+          description: User with this email and password not found.
+  /users/{id}:
+    get:
+      tags:
+        - users
+      summary: A user details.
+      description: A user details.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: User id.
+      responses:
+        "200":
+          description: A user details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "404":
+          description: A user with this id not found.
+        "401":
+          description: The user does’t have valid authentication credentials to get the requested resource.
+
+#  /offers:
+#    post:
+#      tags:
+#        - offers
+
+components:
+  schemas:
+    SignUpUser:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Test,
+        email:
+          type: string
+          example: test@test.com,
+        password:
+          type: string
+          example: 123456
+
+    SingInUser:
+      type: object
+      properties:
+        email:
+          type: string
+          example: test@test.com,
+        password:
+          type: string
+          example: 123456
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        name:
+          type: string
+          example: Test,
+        email:
+          type: string
+          example: test@test.com
+        type:
+          type: number
+          enum:
+            - 0
+            - 1
+          example: 1
+        avatarUrl:
+          type: string
+          example: https://avatar@test.com
+          nullable: true
+        createdAt:
+          type: string
+          example: 2020-07-10
+        updatedAt:
+          type: string
+          example: 2020-07-10
+
+    CreateOffer:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Good hotel
+        description:
+          type: string
+          example: Very good hotel
+        userId:
+          type: string
+        postDate:
+          type: string
+          example: 2020-07-10
+        city:
+          type: string
+          enum:
+            - Paris
+            - Cologne
+            - Brussels
+            - Amsterdam
+            - Hamburg
+            - Dusseldorf
+          example: Auckland
+        price:
+          type: number
+          example: 2000
+        previewUrl:
+          type: string
+          example: https://test.com/1
+        urls:
+          type: array
+          items:
+            type: string
+        isPremium:
+          type: boolean
+          example: true
+        isFavourite:
+          type: boolean
+          example: false
+        rating:
+          type: number
+          example: 5
+        type:
+          type: string
+          example: hotel
+        bedrooms:
+          type: number
+          example: 2
+        guests:
+          type: number
+          example: 1
+        facilities:
+          type: array
+          items:
+            type: string
+        location:
+          $ref: '#/components/schemas/Location'
+
+    Offer:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CreateOffer'
+        - type: object
+        - properties:
+            id:
+              type: string
+            commentsCount:
+              type: number
+              example: 2
+              nullable: true
+            createdAt:
+              type: string
+              example: 2020-07-10
+            updatedAt:
+              type: string
+              example: 2020-07-10
+
+    Location:
+      type: object
+      properties:
+        long:
+          type: number
+          example: -100.4
+        lat:
+          type: number
+          example: 100.56
+
+    CreateComment:
+      type: object
+      properties:
+        text:
+          type: string
+        publishDate:
+          type: string
+          example: 2020-07-10
+        userId:
+          type: string
+
+
+    Comment:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CreateComment'
+        - type: object
+        - properties:
+            id:
+              type: string
+            rating:
+              type: number
+              example: 2
+            createdAt:
+              type: string
+              example: 2020-07-10
+            updatedAt:
+              type: string
+              example: 2020-07-10
