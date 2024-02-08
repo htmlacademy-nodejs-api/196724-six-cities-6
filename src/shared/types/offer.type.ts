@@ -1,12 +1,13 @@
-import {City} from './city.enums.js';
-import {PropertyType} from './property-type.enums.js';
-import {Location} from './location.type.js';
-import {Facility} from './facility.enums.js';
+import { City } from './city.enums.js';
+import { PropertyType } from './property-type.enums.js';
+import { Location } from './location.type.js';
+import { Facility } from './facility.enums.js';
 
 export type Offer = {
+  userId: string;
   name: string;
   description: string;
-  postDate: Date;
+  postDate: string;
   city: City;
   price: number;
   previewUrl: string;
@@ -18,7 +19,6 @@ export type Offer = {
   bedrooms: number
   guests: number,
   facilities: Facility[];
-  createdBy: string;
   location: Location;
   commentsCount?: number;
 }

@@ -11,7 +11,8 @@ export class Config implements IConfig<ApplicationSchema> {
   private readonly config: ApplicationSchema;
 
   constructor(
-    @inject(Components.Logger) private readonly logger: Logger) {
+    @inject(Components.Logger) private readonly logger: Logger
+  ) {
     const { error, parsed } = config();
 
     if (error) {

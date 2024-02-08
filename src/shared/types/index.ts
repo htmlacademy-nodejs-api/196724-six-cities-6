@@ -6,3 +6,4 @@ export * from './property-type.enums.js';
 export * from './mocked-offers.type.js';
 export * from './events.enums.js';
 export * from './component.enums.js';
+export * from './user.type.js';

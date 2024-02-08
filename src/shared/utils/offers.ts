@@ -10,12 +10,12 @@ export const mapToOffer = (data: string): Offer => {
     name, description, postDate, city, price,
     previewUrl, urls, isPremium, isFavourite,
     rating, type, bedrooms, guests, facilities,
-    createdBy, location
+    userId, location
   ] = data.replace('\n', '').split('\t');
   return {
     name,
     description,
-    postDate: new Date(postDate),
+    postDate,
     city: city as City,
     previewUrl,
     urls: urls.split(','),
@@ -27,7 +27,7 @@ export const mapToOffer = (data: string): Offer => {
     bedrooms: Number(bedrooms),
     guests: Number(guests),
     facilities: facilities.split(',') as Facility[],
-    createdBy,
+    userId,
     location: getLocation(location),
   };
 };

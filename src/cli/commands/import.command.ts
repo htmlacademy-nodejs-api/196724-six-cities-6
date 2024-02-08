@@ -1,30 +1,68 @@
 import { Command } from './command.interface.js';
 import { TSVFileReader } from '../../shared/libs/file-reader/index.js';
-import { logError, logInfo, mapToOffer } from '../../shared/utils/index.js';
+import { getMongoUrl, mapToOffer } from '../../shared/utils/index.js';
 import { Commands } from './commands.enums.js';
 import { Events, Offer } from '../../shared/types/index.js';
+import { injectable } from 'inversify';
+import { DatabaseClient } from '../../shared/libs/database-client/index.js';
+import { UserModel, UserService} from '../../shared/modules/user/index.js';
+import { OfferModel, OfferService} from '../../shared/modules/offer/index.js';
+import { ConsoleLogger } from '../../shared/libs/logger/console.logger.js';
 
+@injectable()
 export class ImportCommand implements Command {
-  private offers: Offer[] = [];
+  private offersCount: number = 0;
+
+  private consoleLogger: ConsoleLogger = new ConsoleLogger();
+  private userService: UserService = new UserService(UserModel, this.consoleLogger);
+  private offerService: OfferService = new OfferService(OfferModel, this.consoleLogger);
+  private databaseClient: DatabaseClient = new DatabaseClient(this.consoleLogger);
+
+
   public getName(): string {
     return Commands.import;
   }
 
-  private onImportedLine = (line: string) => {
+  private onImportedLine = async (line: string, resolve: () => void): Promise<void> => {
     const offer = mapToOffer(line);
-    this.offers.push(offer);
+    await this.saveOffer(offer);
+    resolve();
   };
 
-  private onCompleteImport = () => {
-    console.info(this.offers);
-    logInfo(`${this.offers.length} rows imported.`);
+  private onCompleteImport = async (): Promise<void> => {
+    this.consoleLogger.info(`${this.offersCount} rows imported.`);
+    await this.databaseClient.disconnect();
   };
+
+  private async saveOffer(offer: Offer) {
+    const user = await this.userService.findById(offer.userId);
+
+    if (user) {
+      try {
+        await this.offerService.create(offer);
+        this.offersCount += 1;
+      } catch (error) {
+        this.consoleLogger.error('Can not create an offer', error as Error);
+      }
+
+    }
+  }
 
   public async execute(...parameters: string[]): Promise<void> {
-    const [filename] = parameters;
-    if (!filename) {
-      throw Error('Filename have not been passed!');
+    const [filename, username, password, host, port, databaseName] = parameters;
+    if (!filename || !username || !password || !host || !port || !databaseName) {
+      throw Error('One of required arguments has not been passed! Please run --help command for instructions.');
     } else {
+
+      const url = getMongoUrl({
+        username,
+        password,
+        host,
+        port,
+        databaseName
+      });
+      await this.databaseClient.connect(url);
+
       const fileReader = new TSVFileReader(filename.trim());
 
       fileReader.on(Events.line, this.onImportedLine);
@@ -33,8 +71,7 @@ export class ImportCommand implements Command {
       try {
         await fileReader.read();
       } catch (error) {
-        logError(`Can't import data from file: ${filename}`);
-        logError(error);
+        this.consoleLogger.error(`Can't import data from file: ${filename}`, error as Error);
       }
     }
   }
