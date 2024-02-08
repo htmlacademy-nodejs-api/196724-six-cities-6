@@ -1,7 +1,8 @@
-import {Location, PropertyType} from '../../types/index.js';
+import { PropertyType } from '../../types/index.js';
 import { getModelForClass, prop, modelOptions } from '@typegoose/typegoose';
 import { BaseDocument } from '../base-document.js';
 import { CreateOfferDto } from './create-offer-dto.js';
+import { CreateLocation } from './create-location-dto.js';
 
 @modelOptions({
   schemaOptions: {
@@ -63,8 +64,8 @@ export class OfferEntity extends BaseDocument {
   @prop({ type: () => [String], required: true, default: [] })
   public facilities: string[];
 
-  @prop({ type: () => Object, required: true, default: null})
-  public location: Location;
+  @prop({ type: () => CreateLocation, required: true, default: null})
+  public location: CreateLocation;
 }
 
 export const OfferModel = getModelForClass(OfferEntity);
