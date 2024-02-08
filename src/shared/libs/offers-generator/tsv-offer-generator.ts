@@ -42,12 +42,12 @@ export class TsvOfferGenerator implements OfferGenerator {
     const bedrooms = getRandomNumber(MIN_BEDROOMS, MAX_BEDROOMS);
     const guests = getRandomNumber(MIN_GUESTS, MAX_GUESTS);
     const facilities = getSlicedRandomArray(allFacilities, maxFacilities).join(',');
-    const createdBy = getRandomItem(this.offersData.creators);
+    const userId = getRandomItem(this.offersData.userIds);
     const location = `${getRandomNumber(MIN_LONG_LAT, MAX_LONG_LAT, true).toFixed(LONG_LAT_FRACTION_DIGITS)},${getRandomNumber(MIN_LONG_LAT, MAX_LONG_LAT, true).toFixed(LONG_LAT_FRACTION_DIGITS)}`;
 
     return [
       name, description, postData, city, price, previewUrl, urls, isPremium,
-      isFavourite, rating, type, bedrooms, guests, facilities, createdBy, location
+      isFavourite, rating, type, bedrooms, guests, facilities, userId, location
     ].join('\t');
   }
 }

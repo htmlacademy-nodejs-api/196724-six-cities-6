@@ -8,17 +8,15 @@ import { DatabaseClient } from '../../shared/libs/database-client/index.js';
 import { UserModel, UserService} from '../../shared/modules/user/index.js';
 import { OfferModel, OfferService} from '../../shared/modules/offer/index.js';
 import { ConsoleLogger } from '../../shared/libs/logger/console.logger.js';
-import { Logger} from '../../shared/libs/logger/index.js';
 
 @injectable()
 export class ImportCommand implements Command {
   private offersCount: number = 0;
 
   private consoleLogger: ConsoleLogger = new ConsoleLogger();
-  private logger: ConsoleLogger = new Logger();
-  private userService: UserService = new UserService(UserModel, this.logger);
-  private offerService: OfferService = new OfferService(OfferModel, this.logger);
-  private databaseClient: DatabaseClient = new DatabaseClient(this.logger);
+  private userService: UserService = new UserService(UserModel, this.consoleLogger);
+  private offerService: OfferService = new OfferService(OfferModel, this.consoleLogger);
+  private databaseClient: DatabaseClient = new DatabaseClient(this.consoleLogger);
 
 
   public getName(): string {

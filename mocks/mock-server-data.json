@@ -47,13 +47,8 @@
       "Towels",
       "Fridge"
     ],
-    "creators": [
-      "Ilya Suglobov",
-      "Tom Kitch",
-      "Luke Devidson",
-      "Damian Kennedy",
-      "Ivan Suglobov",
-      "Boris Smith"
+    "userIds": [
+      "65c0bf5135a2c753f9298e63"
     ]
   }
 }
