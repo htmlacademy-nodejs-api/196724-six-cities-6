@@ -1,16 +1,11 @@
 #!/usr/bin/env node
-import { CliApplication, HelpCommand, VersionCommand, ImportCommand, GenerateCommand } from './cli/index.js';
+import { InversifyContainer } from './shared/libs/inversify-container/index.js';
 
+const container = new InversifyContainer();
 function bootstrap() {
-  const cliApplication = new CliApplication();
-  cliApplication.registerCommands([
-    new HelpCommand(),
-    new VersionCommand(),
-    new ImportCommand(),
-    new GenerateCommand()
-  ]);
-
-  cliApplication.processCommand(process.argv);
+  container.initCliApplication();
+  container.cliApplication.registerCommands();
+  container.cliApplication.processCommand(process.argv);
 }
 
 bootstrap();

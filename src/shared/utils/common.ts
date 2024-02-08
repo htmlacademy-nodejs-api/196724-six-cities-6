@@ -1,8 +1,12 @@
 import { DateTime } from 'luxon';
 
 export const getRandomNumber = (min: number, max: number, isDecimal?: boolean): number => {
-  if(min >= max) {
+  if(min > max) {
     throw Error('Max argument should be greater than min.');
+  }
+
+  if(min === max) {
+    return min;
   }
   const minInt: number = Math.ceil(min);
   const maxInt: number = Math.floor(max);

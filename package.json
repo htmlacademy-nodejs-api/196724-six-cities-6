@@ -14,11 +14,14 @@
     "compile": "tsc -p tsconfig.json",
     "clean": "rimraf dist",
     "ts": "ts-node",
-    "cli-import": "ts-node ./src/main.cli.ts --import ./mocks/offers.tsv",
+    "cli-help": "ts-node ./src/main.cli.ts --help",
+    "cli-version": "ts-node ./src/main.cli.ts --version",
+    "cli-import": "ts-node ./src/main.cli.ts --import ./mocks/offers.tsv admin test 127.0.0.1 27017 six-cities | pino-pretty --colorize --translateTime SYS:standard",
     "cli-generate": "ts-node ./src/main.cli.ts --generate 10 ./mocks/offers.tsv http://localhost:4000/api",
     "run-json-server": "json-server mocks/mock-server-data.json",
     "start": "npm run build && node ./dist/main.application.js",
-    "start:dev": "nodemon"
+    "start:dev": "nodemon",
+    "docker-mongo": "docker compose -f ./docker-compose.dev.yml --env-file ./.env -p six-cities up -d"
   },
   "devDependencies": {
     "@types/convict": "^6.1.4",
@@ -43,12 +46,14 @@
     "npm": ">=8"
   },
   "dependencies": {
+    "@typegoose/typegoose": "^11.5.0",
     "axios": "^1.6.7",
     "convict": "^6.2.4",
     "convict-format-with-validator": "^6.2.0",
     "dotenv": "^16.3.1",
     "inversify": "^6.0.1",
     "luxon": "^3.4.4",
+    "mongoose": "^7.5.3",
     "pino": "^8.15.1",
     "reflect-metadata": "^0.1.13"
   }
