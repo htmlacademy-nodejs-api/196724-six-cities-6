@@ -16,10 +16,10 @@ export const retryConnection = async (options: {callback: () => Promise<void>, o
     return await callback();
   } catch (error) {
     if (tries > 1) {
-      onFailed()
+      onFailed();
       return await retryConnection({ callback, onFailed, tries: tries - 1 });
     } else {
       throw error;
     }
   }
-}
+};

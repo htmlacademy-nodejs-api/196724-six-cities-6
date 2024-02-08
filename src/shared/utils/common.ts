@@ -6,7 +6,7 @@ export const getRandomNumber = (min: number, max: number, isDecimal?: boolean): 
   }
 
   if(min === max) {
-    return min
+    return min;
   }
   const minInt: number = Math.ceil(min);
   const maxInt: number = Math.floor(max);

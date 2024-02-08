@@ -1,7 +1,7 @@
 import { City, Facility, PropertyType } from '../../types/index.js';
 import { CreateLocation } from './create-location-dto.js';
 
-export class CreateOfferDto  {
+export class CreateOfferDto {
   public userId: string;
   public name: string;
   public description: string;
