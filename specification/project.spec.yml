@@ -354,7 +354,7 @@ paths:
         required: true
       responses:
         "201":
-          description: A new offer comment has been created nad published.
+          description: A new offer comment has been created and published.
           content:
             application/json:
               schema:
