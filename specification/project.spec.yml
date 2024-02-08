@@ -8,17 +8,17 @@ info:
     url: https://opensource.org/licenses/MIT
   version: 2.0.0
 tags:
-  - name: users
+  - name: USERS
     description: Users operations.
-  - name: offers
+  - name: OFFERS
     description: Offers operations.
-  - name: comments
+  - name: COMMENTS
     description: Comments operations.
 paths:
-  /users/signup:
+  /users/create:
     post:
       tags:
-        - users
+        - USERS
       summary: A user sign-up.
       description: A new user sign-up.
       requestBody:
@@ -26,7 +26,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SignUpUser'
+              $ref: '#/components/schemas/CreateUserRequest'
         required: true
       responses:
         "201":
@@ -39,11 +39,10 @@ paths:
           description: Not valid email or password.
         "409":
           description: User with this email already exists.
-
-  /users/signin:
+  /users/login:
     post:
       tags:
-        - users
+        - USERS
       summary: A user sign-in.
       description: A user sign-in.
       requestBody:
@@ -51,7 +50,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SingInUser'
+              $ref: '#/components/schemas/LoginUserRequest'
         required: true
       responses:
         "200":
@@ -65,10 +64,50 @@ paths:
           description: Not valid email or password.
         "404":
           description: User with this email and password not found.
+  /users/logout:
+    post:
+      tags:
+        - USERS
+      summary: A user sign-out.
+      description: A user sign-out.
+      responses:
+        "200":
+          description: A user logged out succeed.
+          content:
+            text/plain:
+              schema:
+                type: string
+                # @TODO It must return something different
+                example: true
+        "400":
+          description: Bad Request.
+        "401":
+          description: Unauthorized.
+        "404":
+          description: Not Found.
+  /users/ping:
+    get:
+      tags:
+        - USERS
+      summary: A user authorisation check.
+      description: A user authorisation check.
+      responses:
+        "200":
+          description: The user is authorised.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "400":
+          description: Bad Request.
+        "401":
+          description: Unauthorized.
+        "404":
+          description: Not Found.
   /users/{id}:
     get:
       tags:
-        - users
+        - USERS
       summary: A user details.
       description: A user details.
       parameters:
@@ -90,14 +129,243 @@ paths:
         "401":
           description: The user does’t have valid authentication credentials to get the requested resource.
 
-#  /offers:
-#    post:
-#      tags:
-#        - offers
+  /offers/create:
+    post:
+      tags:
+        - OFFERS
+      summary: A new offer.
+      description: Allows adding a new offers based on request body data.
+      requestBody:
+        description: A new offer data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOfferRequest'
+        required: true
+      responses:
+        "201":
+          description: A new offer has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+        "400":
+          description: Not valid data.
+  /offers/update:
+    post:
+      tags:
+        - OFFERS
+      summary: An offer update.
+      description: Allows updating an existing offer based on request body data.
+      requestBody:
+        description: Update offer data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOfferRequest'
+        required: true
+      responses:
+        "201":
+          description: Offer has been updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+        "400":
+          description: Not valid data.
+  /offers/delete/{id}:
+    delete:
+      tags:
+        - OFFERS
+      summary: An offer deletion.
+      description: Allows deleting an existing offer.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Offer id.
+      responses:
+        "200":
+          description: Offer has been deleted.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: true
+        "404":
+          description: Offer not found.
+  /offers:
+    get:
+      tags:
+        - OFFERS
+      summary: Offers list.
+      description: Retrieve offers list.
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: string
+            default: 60
+          required: false
+          description: Offers limit to retrieve
+      responses:
+        "200":
+          description: List of offers.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Offer'
+        "404":
+          description: Offers not found.
+  /offers/{id}:
+    get:
+      tags:
+        - OFFERS
+      summary: Get offer by id.
+      description: Retrieve individual full offer by id.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Full offer data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullOffer'
+        "404":
+          description: Offer not found.
+  /offers/premium:
+    get:
+      tags:
+        - OFFERS
+      summary: Premium offers list.
+      description: Retrieve three premium offers queried by city.
+      parameters:
+        - in: query
+          name: city
+          schema:
+            type: string
+            example: London
+          required: true
+          description: Offer city.
+      responses:
+        "200":
+          description: List of premium offers.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Offer'
+        "404":
+          description: Offers not found.
+  /offers/favourites:
+    get:
+      tags:
+        - OFFERS
+      summary: Favourites offers list.
+      description: Retrieve favourites offers.
+      responses:
+        "200":
+          description: List of premium offers.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Offer'
+        "404":
+          description: Offers not found.
+  /offers/favourite/update:
+    patch:
+      tags:
+        - OFFERS
+      summary: Manage a user favourite offers list.
+      description: Allows adding or deleting an offer from a user favourite list.
+      requestBody:
+        description: Update a user favourite offers data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserFavouriteOffersPatchRequest'
+        required: true
+      responses:
+        "200":
+          description: Offer has been added or deleted.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: true
+        "404":
+          description: Offer not found.
+
+  /comments/offers/{id}:
+    get:
+      tags:
+        - COMMENTS
+      summary: An offer comments.
+      description: Retrieve an offer comments list.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Offer id.
+        - in: query
+          name: limit
+          schema:
+            type: string
+            default: 50
+          required: false
+          description: Offer comments limit to retrieve.
+      responses:
+        "200":
+          description: List of an offer comments.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        "404":
+          description: Comments not found.
+  /comments/offers:
+    post:
+      tags:
+        - COMMENTS
+      summary: A new offer comment.
+      description: Allows adding a new comment for an offer based on request body data.
+      requestBody:
+        description: A new comment data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentRequest'
+        required: true
+      responses:
+        "201":
+          description: A new offer comment has been created nad published.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        "400":
+          description: Not valid data.
 
 components:
   schemas:
-    SignUpUser:
+    # Users related
+    CreateUserRequest:
       type: object
       properties:
         name:
@@ -109,8 +377,7 @@ components:
         password:
           type: string
           example: 123456
-
-    SingInUser:
+    LoginUserRequest:
       type: object
       properties:
         email:
@@ -119,7 +386,6 @@ components:
         password:
           type: string
           example: 123456
-
     User:
       type: object
       properties:
@@ -138,6 +404,11 @@ components:
             - 0
             - 1
           example: 1
+        favourites:
+          type: array
+          items:
+            type: string
+          nullable: true
         avatarUrl:
           type: string
           example: https://avatar@test.com
@@ -148,8 +419,22 @@ components:
         updatedAt:
           type: string
           example: 2020-07-10
+    UserFavouriteOffersPatchRequest:
+      type: object
+      properties:
+        offerId:
+          type: string
 
-    CreateOffer:
+    # Offers related
+    CreateOfferRequest:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/UpdateOfferRequest'
+        - type: object
+        - properties:
+            userId:
+              type: string
+    UpdateOfferRequest:
       type: object
       properties:
         name:
@@ -158,8 +443,6 @@ components:
         description:
           type: string
           example: Very good hotel
-        userId:
-          type: string
         postDate:
           type: string
           example: 2020-07-10
@@ -183,15 +466,6 @@ components:
           type: array
           items:
             type: string
-        isPremium:
-          type: boolean
-          example: true
-        isFavourite:
-          type: boolean
-          example: false
-        rating:
-          type: number
-          example: 5
         type:
           type: string
           example: hotel
@@ -207,26 +481,42 @@ components:
             type: string
         location:
           $ref: '#/components/schemas/Location'
-
     Offer:
       type: object
       allOf:
-        - $ref: '#/components/schemas/CreateOffer'
+        - $ref: '#/components/schemas/CreateOfferRequest'
         - type: object
         - properties:
-            id:
-              type: string
+            isPremium:
+              type: boolean
+              example: true
+              nullable: true
+            rating:
+              type: number
+              example: 5
+              nullable: true
             commentsCount:
               type: number
               example: 2
               nullable: true
+            id:
+              type: string
             createdAt:
               type: string
               example: 2020-07-10
             updatedAt:
               type: string
               example: 2020-07-10
-
+    FullOffer:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Offer'
+        - type: object
+        - properties:
+            isFavourite:
+              type: boolean
+              example: true
+              nullable: true
     Location:
       type: object
       properties:
@@ -237,29 +527,28 @@ components:
           type: number
           example: 100.56
 
-    CreateComment:
+    # Comments related
+    CreateCommentRequest:
       type: object
       properties:
         text:
           type: string
+        rating:
+          type: number
+          example: 1 to 5
         publishDate:
           type: string
           example: 2020-07-10
         userId:
           type: string
-
-
     Comment:
       type: object
       allOf:
-        - $ref: '#/components/schemas/CreateComment'
+        - $ref: '#/components/schemas/CreateCommentRequest'
         - type: object
         - properties:
             id:
               type: string
-            rating:
-              type: number
-              example: 2
             createdAt:
               type: string
               example: 2020-07-10

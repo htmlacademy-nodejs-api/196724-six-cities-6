@@ -15,6 +15,7 @@ export class UserService implements IUserService {
 
   public async create(dto: CreateUserDto, salt: string | undefined): Promise<DocumentType<UserEntity>> {
     const user = new UserEntity(dto);
+    // @TODO get salt from config
     if (salt) {
       user.setPassword(salt);
       const result = this.userModel.create(user);
@@ -23,14 +24,6 @@ export class UserService implements IUserService {
     }
 
     throw Error('SALT has not been provided for password hashing.');
-  }
-
-  public async findByEmail(email: string): Promise<DocumentType<UserEntity> | null> {
-    const user = this.userModel.findOne({ email });
-    if (user) {
-      return user;
-    }
-    throw Error(`User with email: ${email} has not been found!`);
   }
 
   public async findById(id: string): Promise<DocumentType<UserEntity> | null> {
