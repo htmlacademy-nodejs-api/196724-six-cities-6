@@ -1,5 +1,5 @@
 import { DocumentType } from '@typegoose/typegoose';
-import {CreateUserDto} from './create-user-dto.interface.js';
+import {CreateUserDto} from './create-user-dto.js';
 import {UserEntity} from './user.entity.js';
 
 export interface IUserService {

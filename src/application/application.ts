@@ -16,7 +16,7 @@ export class Application implements IApplication {
   ) {
   }
 
-  private initializeDataBase() {
+  private initializeDatabase() {
     const url = getMongoUrl({
       username: this.config.get('DB_USER'),
       password: this.config.get('DB_PASSWORD'),
@@ -32,7 +32,7 @@ export class Application implements IApplication {
     this.logger.info(`Get value from env $PORT: ${this.config.get('PORT')}`);
 
     this.logger.info('Init database connection ...');
-    await this.initializeDataBase();
+    await this.initializeDatabase();
     this.logger.info('Init database completed');
   }
 }

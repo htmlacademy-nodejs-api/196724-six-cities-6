@@ -1,6 +1,7 @@
-import { Offer, PropertyType } from '../../types/index.js';
+import { PropertyType } from '../../types/index.js';
 import { getModelForClass, prop, modelOptions } from '@typegoose/typegoose';
 import {BaseDocument} from '../base-document.js';
+import {CreateOfferDto} from './create-offer-dto.js';
 
 @modelOptions({
   schemaOptions: {
@@ -8,9 +9,8 @@ import {BaseDocument} from '../base-document.js';
     timestamps: true,
   }
 })
-
 export class OfferEntity extends BaseDocument {
-  constructor(data: Offer) {
+  constructor(data: CreateOfferDto) {
     super();
     this.userId = data.userId;
     this.name = data.name;
@@ -20,14 +20,11 @@ export class OfferEntity extends BaseDocument {
     this.previewUrl = data.previewUrl;
     this.urls = data.urls;
     this.isPremium = data.isPremium;
-    this.isFavourite = data.isFavourite;
-    this.rating = data.rating;
     this.type = data.type;
     this.bedrooms = data.bedrooms;
     this.guests = data.guests;
     this.facilities = data.facilities;
-    this.location = JSON.stringify(data.location);
-    this.commentsCount = data.commentsCount;
+    this.location = data.location;
   }
 
   @prop({ required: true })
@@ -54,12 +51,6 @@ export class OfferEntity extends BaseDocument {
   @prop({ required: true, default: false })
   public isPremium: boolean;
 
-  @prop({ required: true, default: false })
-  public isFavourite: boolean;
-
-  @prop({ required: true, min: 1, max: 5, default: 1 })
-  public rating: number;
-
   @prop({ required: true, default: PropertyType.apartment })
   public type: string;
 
@@ -72,11 +63,8 @@ export class OfferEntity extends BaseDocument {
   @prop({ type: [String], required: true, default: [] })
   public facilities: string[];
 
-  @prop({ required: true, default: { long: 0, lat: 0 }})
-  public location: string;
-
-  @prop({ default: null })
-  public commentsCount?: number;
+  @prop({ type: Object, required: true, default: { long: 0, lat: 0 }})
+  public location: object;
 }
 
 export const OfferModel = getModelForClass(OfferEntity);

@@ -4,7 +4,7 @@ import { Components } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { IOfferService } from './offer-service.interface.js';
 import { OfferEntity } from './offer.entity.js';
-import { CreateOfferDto } from './create-offer-dto.interface.js';
+import { CreateOfferDto } from './create-offer-dto.js';
 
 @injectable()
 export class OfferService implements IOfferService {

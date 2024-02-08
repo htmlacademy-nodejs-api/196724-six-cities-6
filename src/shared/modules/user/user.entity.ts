@@ -11,7 +11,6 @@ const VALIDATE_EMAIL_REG_EX = /^([\w-\\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
     timestamps: true,
   }
 })
-
 export class UserEntity extends BaseDocument {
   constructor(data: User) {
     super();
@@ -31,11 +30,11 @@ export class UserEntity extends BaseDocument {
   @prop({ required: true, minlength: 6 })
   public password: string;
 
-  @prop({ required: false, default: null })
-  public avatarUrl?: string;
-
   @prop({ required: true, default: UserType.BASIC })
   public type: UserType;
+
+  @prop({ required: false, default: null })
+  public avatarUrl?: string;
 
   public setPassword(salt: string) {
     this.password = getGeneratedSHA256(this.password, salt);

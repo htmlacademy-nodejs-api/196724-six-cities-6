@@ -1,6 +1,6 @@
 export enum UserType {
-  BASIC = 0,
-  PRO = 1
+  BASIC = "basic",
+  PRO = "pro"
 }
 
 export type User = {
