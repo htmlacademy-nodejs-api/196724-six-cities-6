@@ -64,28 +64,7 @@ paths:
           description: Not valid email or password.
         "404":
           description: User with this email and password not found.
-  /users/logout:
-    post:
-      tags:
-        - USERS
-      summary: A user sign-out.
-      description: A user sign-out.
-      responses:
-        "200":
-          description: A user logged out succeed.
-          content:
-            text/plain:
-              schema:
-                type: string
-                # @TODO It must return something different
-                example: true
-        "400":
-          description: Bad Request.
-        "401":
-          description: Unauthorized.
-        "404":
-          description: Not Found.
-  /users/ping:
+  /users/check:
     get:
       tags:
         - USERS
@@ -151,8 +130,8 @@ paths:
                 $ref: '#/components/schemas/Offer'
         "400":
           description: Not valid data.
-  /offers/update:
-    put:
+  /offers/patch:
+    patch:
       tags:
         - OFFERS
       summary: An offer update.
@@ -165,7 +144,7 @@ paths:
               $ref: '#/components/schemas/UpdateOfferRequest'
         required: true
       responses:
-        "201":
+        "200":
           description: Offer has been updated.
           content:
             application/json:
