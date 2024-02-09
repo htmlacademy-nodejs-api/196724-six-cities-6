@@ -152,7 +152,7 @@ paths:
         "400":
           description: Not valid data.
   /offers/update:
-    post:
+    put:
       tags:
         - OFFERS
       summary: An offer update.
