@@ -3,14 +3,12 @@ import { Container } from 'inversify';
 import { IInversifyContainer } from './inversify-container.interface.js';
 import { Application, IApplication } from '../../../application/index.js';
 import { Components } from '../../types/index.js';
-import { ILogger, Logger } from '../logger/index.js';
+import { ILogger, Logger, ConsoleLogger } from '../logger/index.js';
 import { ApplicationSchema, Config, IConfig } from '../config/index.js';
 import { DatabaseClient, IDatabaseClient } from '../database-client/index.js';
-import { IUserService, UserEntity, UserModel } from '../../modules/user/index.js';
+import { IUserService, UserEntity, UserModel, UserService } from '../../modules/user/index.js';
 import { types } from '@typegoose/typegoose';
 import { IOfferService, OfferEntity, OfferModel, OfferService } from '../../modules/offer/index.js';
-import { UserService } from '../../modules/user/index.js';
-import { ConsoleLogger } from '../logger/console.logger.js';
 import {
   CliApplication,
   Command,
@@ -20,6 +18,7 @@ import {
   ImportCommand,
   VersionCommand
 } from '../../../cli/index.js';
+import { ICommentService, CommentService, CommentEntity, CommentModel } from '../../modules/comment/index.js';
 
 export class InversifyContainer extends Container implements IInversifyContainer {
   public initMainApplication() {
@@ -35,6 +34,8 @@ export class InversifyContainer extends Container implements IInversifyContainer
     this.bind<types.ModelType<UserEntity>>(Components.UserModel).toConstantValue(UserModel);
     this.bind<IOfferService>(Components.OfferService).to(OfferService).inSingletonScope();
     this.bind<types.ModelType<OfferEntity>>(Components.OfferModel).toConstantValue(OfferModel);
+    this.bind<ICommentService>(Components.CommentService).to(CommentService).inSingletonScope();
+    this.bind<types.ModelType<CommentEntity>>(Components.CommentModel).toConstantValue(CommentModel);
   }
 
   private initCliCommands() {

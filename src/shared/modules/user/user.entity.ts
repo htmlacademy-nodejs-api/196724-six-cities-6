@@ -1,4 +1,4 @@
-import { User, UserType } from '../../types/index.js';
+import { Collections, User, UserType } from '../../types/index.js';
 import { getModelForClass, prop, modelOptions } from '@typegoose/typegoose';
 import { getGeneratedSHA256 } from '../../utils/index.js';
 import { BaseDocument } from '../base-document.js';
@@ -7,7 +7,7 @@ const VALIDATE_EMAIL_REG_EX = /^([\w-\\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
 
 @modelOptions({
   schemaOptions: {
-    collection: 'users',
+    collection: Collections.users,
     timestamps: true,
   }
 })

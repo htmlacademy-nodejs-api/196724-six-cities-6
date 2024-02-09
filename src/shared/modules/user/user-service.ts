@@ -1,10 +1,11 @@
 import { DocumentType, types } from '@typegoose/typegoose';
-import { CreateUserDto} from './create-user-dto.js';
+import { CreateUserDto} from './dtos/create-user-dto.js';
 import { UserEntity } from './user.entity.js';
 import { IUserService } from './user-service.interface.js';
 import { inject, injectable } from 'inversify';
 import { Components } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
+import { LoginUserDto } from './dtos/index.js';
 
 @injectable()
 export class UserService implements IUserService {
@@ -17,7 +18,7 @@ export class UserService implements IUserService {
     const user = new UserEntity(dto);
     if (salt) {
       user.setPassword(salt);
-      const result = this.userModel.create(user);
+      const result = await this.userModel.create(user);
       this.logger.info(`New user created: ${user.email}`);
       return result;
     }
@@ -25,19 +26,26 @@ export class UserService implements IUserService {
     throw Error('SALT has not been provided for password hashing.');
   }
 
-  public async findByEmail(email: string): Promise<DocumentType<UserEntity> | null> {
-    const user = this.userModel.findOne({ email });
-    if (user) {
-      return user;
-    }
-    throw Error(`User with email: ${email} has not been found!`);
-  }
-
   public async findById(id: string): Promise<DocumentType<UserEntity> | null> {
-    const user = this.userModel.findOne({ _id: id });
+    const user = this.userModel.findOne({ _id: id }).exec();
     if (user) {
       return user;
     }
     throw Error(`User with id: ${id} has not been found!`);
+  }
+
+  // @TODO just a placeholder method
+  public async login(dto: LoginUserDto): Promise<string> {
+    return Promise.resolve(dto.email);
+  }
+
+  // @TODO just a placeholder method
+  public async logout(): Promise<string> {
+    return Promise.resolve('true');
+  }
+
+  // @TODO just a placeholder method
+  public async ping(): Promise<DocumentType<UserEntity> | null>{
+    return Promise.resolve(null);
   }
 }

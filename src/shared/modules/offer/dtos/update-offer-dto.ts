@@ -1,0 +1,17 @@
+import { City, Facility, PropertyType } from '../../../types/index.js';
+import { CreateLocation } from './create-location-dto.js';
+export class UpdateOfferDto {
+  public name?: string;
+  public description?: string;
+  public postDate?: string;
+  public city?: City;
+  public price?: number;
+  public previewUrl?: string;
+  public urls?: string[];
+  public type?: PropertyType;
+  public bedrooms?: number;
+  public guests?: number;
+  public facilities?: Facility[];
+  public location?: CreateLocation;
+  public isPremium?: boolean;
+}

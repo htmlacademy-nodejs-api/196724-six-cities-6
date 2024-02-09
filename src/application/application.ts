@@ -6,7 +6,6 @@ import { Components } from '../shared/types/index.js';
 import { IDatabaseClient } from '../shared/libs/database-client/index.js';
 import { getMongoUrl } from '../shared/utils/database.js';
 
-
 @injectable()
 export class Application implements IApplication {
   constructor(

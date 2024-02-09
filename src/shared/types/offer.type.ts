@@ -12,13 +12,13 @@ export type Offer = {
   price: number;
   previewUrl: string;
   urls: string[];
-  isPremium: boolean;
-  isFavourite: boolean;
-  rating: number,
   type: PropertyType;
   bedrooms: number
   guests: number,
   facilities: Facility[];
   location: Location;
   commentsCount?: number;
+  isPremium?: boolean;
+  isFavourite?: boolean;
+  rating?: number,
 }

@@ -1,35 +1,21 @@
-import { PropertyType } from '../../types/index.js';
-import { getModelForClass, prop, modelOptions } from '@typegoose/typegoose';
+import { Collections, PropertyType } from '../../types/index.js';
+import { getModelForClass, prop, modelOptions, Ref } from '@typegoose/typegoose';
 import { BaseDocument } from '../base-document.js';
-import { CreateOfferDto } from './create-offer-dto.js';
-import { CreateLocation } from './create-location-dto.js';
+import { CreateLocation } from './dtos/index.js';
+import { UserEntity } from '../user/index.js';
 
 @modelOptions({
   schemaOptions: {
-    collection: 'offers',
+    collection: Collections.offers,
     timestamps: true,
   }
 })
 export class OfferEntity extends BaseDocument {
-  constructor(data: CreateOfferDto) {
-    super();
-    this.userId = data.userId;
-    this.name = data.name;
-    this.description = data.description;
-    this.postDate = data.postDate;
-    this.city = data.city;
-    this.previewUrl = data.previewUrl;
-    this.urls = data.urls;
-    this.isPremium = data.isPremium;
-    this.type = data.type;
-    this.bedrooms = data.bedrooms;
-    this.guests = data.guests;
-    this.facilities = data.facilities;
-    this.location = data.location;
-  }
-
-  @prop({ required: true })
-  public userId: string;
+  @prop({
+    ref: UserEntity,
+    required: true,
+  })
+  public userId: Ref<UserEntity>;
 
   @prop({ required: true, minlength: 10, maxlength: 100 })
   public name: string;
@@ -44,13 +30,16 @@ export class OfferEntity extends BaseDocument {
   public city: string;
 
   @prop({ required: true })
+  public price: number;
+
+  @prop({ required: true })
   public previewUrl: string;
 
   @prop({ type: () => [String], required: true, default: [] })
   public urls: string[];
 
-  @prop({ required: true, default: false })
-  public isPremium: boolean;
+  @prop({ default: false })
+  public isPremium?: boolean;
 
   @prop({ required: true, default: PropertyType.apartment })
   public type: string;
@@ -61,9 +50,13 @@ export class OfferEntity extends BaseDocument {
   @prop({ required: true, min: 1, max: 10, default: 1 })
   public guests: number;
 
+  @prop({ min: 1, max: 5, default: 0 })
+  public rating: number;
+
   @prop({ type: () => [String], required: true, default: [] })
   public facilities: string[];
 
+  // @TODO does not work
   @prop({ type: () => CreateLocation, required: true, default: null})
   public location: CreateLocation;
 }
