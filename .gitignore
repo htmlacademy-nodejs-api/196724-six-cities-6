@@ -11,4 +11,9 @@ coverage
 *.log
 .env
 
+# Swagger artifacts
+gen
+
+# Generated mocked data
 mocks/offers.tsv
+
