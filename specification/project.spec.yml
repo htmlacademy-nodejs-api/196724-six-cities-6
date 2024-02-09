@@ -187,7 +187,7 @@ paths:
           required: true
           description: Offer id.
       responses:
-        "200":
+        "204":
           description: Offer has been deleted.
           content:
             text/plain:
