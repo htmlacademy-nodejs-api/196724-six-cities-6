@@ -16,6 +16,7 @@ export class UserService implements IUserService {
 
   public async create(dto: CreateUserDto, salt: string | undefined): Promise<DocumentType<UserEntity>> {
     const user = new UserEntity(dto);
+    // @TODO get salt from config
     if (salt) {
       user.setPassword(salt);
       const result = await this.userModel.create(user);

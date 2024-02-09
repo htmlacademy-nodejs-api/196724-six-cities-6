@@ -20,7 +20,7 @@
     "cli-generate": "ts-node ./src/main.cli.ts --generate 3 ./mocks/offers.tsv http://localhost:4000/api",
     "run-json-server": "json-server mocks/mock-server-data.json",
     "start": "npm run build && node ./dist/main.application.js",
-    "start:dev": "npm run ts ./src/main.application.ts | pino-pretty --colorize --translateTime SYS:standard",
+    "start:dev": "nodemon",
     "docker-mongo": "docker compose -f ./docker-compose.dev.yml --env-file ./.env -p six-cities up -d"
   },
   "devDependencies": {
@@ -33,6 +33,7 @@
     "eslint": "8.49.0",
     "eslint-config-htmlacademy": "9.1.1",
     "json-server": "^0.17.4",
+    "nodemon": "^3.0.1",
     "pino-pretty": "^10.2.0",
     "rimraf": "5.0.1",
     "ts-node": "10.9.1",

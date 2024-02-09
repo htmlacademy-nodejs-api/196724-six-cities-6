@@ -1,0 +1,536 @@
+openapi: 3.0.0
+info:
+  title: API server for "Six-cities" demo project.
+  description: |-
+    * List of server resources and endpoints.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 2.0.0
+tags:
+  - name: USERS
+    description: Users operations.
+  - name: OFFERS
+    description: Offers operations.
+  - name: COMMENTS
+    description: Comments operations.
+paths:
+  /users/create:
+    post:
+      tags:
+        - USERS
+      summary: A user sign-up.
+      description: A new user sign-up.
+      requestBody:
+        description: A user registration data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+        required: true
+      responses:
+        "201":
+          description: A user registration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "400":
+          description: Not valid email or password.
+        "409":
+          description: User with this email already exists.
+  /users/login:
+    post:
+      tags:
+        - USERS
+      summary: A user sign-in.
+      description: A user sign-in.
+      requestBody:
+        description: A user logging data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUserRequest'
+        required: true
+      responses:
+        "200":
+          description: A user logging succeed.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: aec6e133-49f6-43e6-84ed-f2a8f011d9b3
+        "400":
+          description: Not valid email or password.
+        "404":
+          description: User with this email and password not found.
+  /users/check:
+    get:
+      tags:
+        - USERS
+      summary: A user authorisation check.
+      description: A user authorisation check.
+      responses:
+        "200":
+          description: The user is authorised.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "400":
+          description: Bad Request.
+        "401":
+          description: Unauthorized.
+        "404":
+          description: Not Found.
+  /users/{id}:
+    get:
+      tags:
+        - USERS
+      summary: A user details.
+      description: A user details.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: User id.
+      responses:
+        "200":
+          description: A user details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "404":
+          description: A user with this id not found.
+        "401":
+          description: The user does’t have valid authentication credentials to get the requested resource.
+
+  /offers/create:
+    post:
+      tags:
+        - OFFERS
+      summary: A new offer.
+      description: Allows adding a new offers based on request body data.
+      requestBody:
+        description: A new offer data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOfferRequest'
+        required: true
+      responses:
+        "201":
+          description: A new offer has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+        "400":
+          description: Not valid data.
+  /offers/patch:
+    patch:
+      tags:
+        - OFFERS
+      summary: An offer update.
+      description: Allows updating an existing offer based on request body data.
+      requestBody:
+        description: Update offer data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOfferRequest'
+        required: true
+      responses:
+        "200":
+          description: Offer has been updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+        "400":
+          description: Not valid data.
+  /offers/delete/{id}:
+    delete:
+      tags:
+        - OFFERS
+      summary: An offer deletion.
+      description: Allows deleting an existing offer.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Offer id.
+      responses:
+        "204":
+          description: Offer has been deleted.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: true
+        "404":
+          description: Offer not found.
+  /offers:
+    get:
+      tags:
+        - OFFERS
+      summary: Offers list.
+      description: Retrieve offers list.
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: string
+            default: 60
+          required: false
+          description: Offers limit to retrieve
+      responses:
+        "200":
+          description: List of offers.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Offer'
+        "404":
+          description: Offers not found.
+  /offers/{id}:
+    get:
+      tags:
+        - OFFERS
+      summary: Get offer by id.
+      description: Retrieve individual full offer by id.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Full offer data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullOffer'
+        "404":
+          description: Offer not found.
+  /offers/premium:
+    get:
+      tags:
+        - OFFERS
+      summary: Premium offers list.
+      description: Retrieve three premium offers queried by city.
+      parameters:
+        - in: query
+          name: city
+          schema:
+            type: string
+            example: London
+          required: true
+          description: Offer city.
+      responses:
+        "200":
+          description: List of premium offers.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Offer'
+        "404":
+          description: Offers not found.
+  /offers/favourites:
+    get:
+      tags:
+        - OFFERS
+      summary: Favourites offers list.
+      description: Retrieve favourites offers.
+      responses:
+        "200":
+          description: List of premium offers.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Offer'
+        "404":
+          description: Offers not found.
+  /offers/favourite/update:
+    post:
+      tags:
+        - OFFERS
+      summary: Manage a user favourite offers list.
+      description: Allows adding or deleting an offer from a user favourite list.
+      requestBody:
+        description: Update a user favourite offers data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserFavouriteOffersRequest'
+        required: true
+      responses:
+        "200":
+          description: Offer has been added or deleted.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: true
+        "404":
+          description: Offer not found.
+
+  /comments/offers/{id}:
+    get:
+      tags:
+        - COMMENTS
+      summary: An offer comments.
+      description: Retrieve an offer comments list.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Offer id.
+        - in: query
+          name: limit
+          schema:
+            type: string
+            default: 50
+          required: false
+          description: Offer comments limit to retrieve.
+      responses:
+        "200":
+          description: List of an offer comments.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        "404":
+          description: Comments not found.
+  /comments/offers:
+    post:
+      tags:
+        - COMMENTS
+      summary: A new offer comment.
+      description: Allows adding a new comment for an offer based on request body data.
+      requestBody:
+        description: A new comment data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentRequest'
+        required: true
+      responses:
+        "201":
+          description: A new offer comment has been created and published.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        "400":
+          description: Not valid data.
+
+components:
+  schemas:
+    # Users related
+    CreateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Test,
+        email:
+          type: string
+          example: test@test.com,
+        password:
+          type: string
+          example: 123456
+    LoginUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          example: test@test.com,
+        password:
+          type: string
+          example: 123456
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        name:
+          type: string
+          example: Test,
+        email:
+          type: string
+          example: test@test.com
+        type:
+          type: number
+          enum:
+            - 0
+            - 1
+          example: 1
+        favourites:
+          type: array
+          items:
+            type: string
+          nullable: true
+        avatarUrl:
+          type: string
+          example: https://avatar@test.com
+          nullable: true
+        createdAt:
+          type: string
+          example: 2020-07-10
+        updatedAt:
+          type: string
+          example: 2020-07-10
+    UserFavouriteOffersRequest:
+      type: object
+      properties:
+        offerId:
+          type: string
+
+    # Offers related
+    CreateOfferRequest:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/UpdateOfferRequest'
+        - type: object
+        - properties:
+            userId:
+              type: string
+    UpdateOfferRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Good hotel
+        description:
+          type: string
+          example: Very good hotel
+        postDate:
+          type: string
+          example: 2020-07-10
+        city:
+          type: string
+          enum:
+            - Paris
+            - Cologne
+            - Brussels
+            - Amsterdam
+            - Hamburg
+            - Dusseldorf
+          example: Auckland
+        price:
+          type: number
+          example: 2000
+        previewUrl:
+          type: string
+          example: https://test.com/1
+        urls:
+          type: array
+          items:
+            type: string
+        type:
+          type: string
+          example: hotel
+        bedrooms:
+          type: number
+          example: 2
+        guests:
+          type: number
+          example: 1
+        facilities:
+          type: array
+          items:
+            type: string
+        location:
+          $ref: '#/components/schemas/Location'
+    Offer:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CreateOfferRequest'
+        - type: object
+        - properties:
+            isPremium:
+              type: boolean
+              example: true
+              nullable: true
+            rating:
+              type: number
+              example: 5
+              nullable: true
+            commentsCount:
+              type: number
+              example: 2
+              nullable: true
+            id:
+              type: string
+            createdAt:
+              type: string
+              example: 2020-07-10
+            updatedAt:
+              type: string
+              example: 2020-07-10
+    FullOffer:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Offer'
+        - type: object
+        - properties:
+            isFavourite:
+              type: boolean
+              example: true
+              nullable: true
+    Location:
+      type: object
+      properties:
+        long:
+          type: number
+          example: -100.4
+        lat:
+          type: number
+          example: 100.56
+
+    # Comments related
+    CreateCommentRequest:
+      type: object
+      properties:
+        text:
+          type: string
+        rating:
+          type: number
+          example: 1 to 5
+        publishDate:
+          type: string
+          example: 2020-07-10
+        userId:
+          type: string
+    Comment:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CreateCommentRequest'
+        - type: object
+        - properties:
+            id:
+              type: string
+            createdAt:
+              type: string
+              example: 2020-07-10
+            updatedAt:
+              type: string
+              example: 2020-07-10

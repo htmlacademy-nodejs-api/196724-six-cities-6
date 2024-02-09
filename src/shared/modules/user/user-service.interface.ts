@@ -6,6 +6,5 @@ export interface IUserService {
   create(dto: CreateUserDto, salt: string | undefined): Promise<DocumentType<UserEntity>>;
   findById(id: string): Promise<DocumentType<UserEntity> | null>;
   login(dto: LoginUserDto): Promise<string>;
-  logout(): Promise<string>;
-  ping(): Promise<DocumentType<UserEntity> | null>;
+  check(): Promise<DocumentType<UserEntity> | null>;
 }
