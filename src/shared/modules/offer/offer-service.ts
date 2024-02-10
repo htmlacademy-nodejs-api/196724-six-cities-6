@@ -12,12 +12,16 @@ import {
   commentsLookupPipeline,
   userFavouritesLookupPipeline
 } from './offer-service.pipelines.js';
+import {CommentEntity} from '../comment/index.js';
+import {UserEntity} from '../user/index.js';
 
 
 @injectable()
 export class OfferService implements IOfferService {
   constructor(
     @inject(Components.OfferModel) private readonly offerModel: types.ModelType<OfferEntity>,
+    @inject(Components.CommentModel) private readonly commentModel: types.ModelType<CommentEntity>,
+    @inject(Components.UserModel) private readonly userModel: types.ModelType<UserEntity>,
     @inject(Components.Logger) private readonly logger: ILogger,
   ) {}
 
@@ -37,7 +41,8 @@ export class OfferService implements IOfferService {
 
   public async delete(id: string): Promise<DocumentType<OfferEntity> | null> {
     const result = await this.offerModel.findByIdAndDelete(id).exec();
-    // @TODO 5.3.2 and 5.3.3 not done yet
+    await this.commentModel.deleteMany({ offerId: id }).exec();
+    await this.userModel.updateMany(undefined, { $unset: { favourites: id } }).exec();
     this.logger.info(`${result?.name} offer deleted.`);
     return result;
   }
@@ -85,8 +90,7 @@ export class OfferService implements IOfferService {
       userFavouritesLookupPipeline,
       addedOfferExtraFields,
       { $addFields: { isFavourite: { $toBool: { $size: '$favourites'} }}},
-      { $match: {isFavourite: true }},
-      { $unset: 'isFavourite' },
+      { $match: { isFavourite: true }},
       { $unset: Collections.comments },
       { $unset: Collections.users },
     ]).exec();

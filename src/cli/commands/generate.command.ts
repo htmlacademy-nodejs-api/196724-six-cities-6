@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Command } from './command.interface.js';
 import { Commands } from './commands.enums.js';
-import {Components, MockedOffers} from '../../shared/types/index.js';
+import { Components, MockedOffers } from '../../shared/types/index.js';
 import { TsvOfferGenerator } from '../../shared/libs/offers-generator/index.js';
 import { TSVFileWriter } from '../../shared/libs/file-writer/index.js';
 import { inject, injectable } from 'inversify';

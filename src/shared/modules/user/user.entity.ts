@@ -3,8 +3,6 @@ import { getModelForClass, prop, modelOptions } from '@typegoose/typegoose';
 import { getGeneratedSHA256 } from '../../utils/index.js';
 import { BaseDocument } from '../base-document.js';
 
-const VALIDATE_EMAIL_REG_EX = /^([\w-\\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
-
 @modelOptions({
   schemaOptions: {
     collection: Collections.users,
@@ -22,13 +20,13 @@ export class UserEntity extends BaseDocument {
     this.favourites = data.favourites;
   }
 
-  @prop({ required: true, minlength: 1, maxlength: 15 })
+  @prop({ required: true })
   public name: string;
 
-  @prop({ required: true, unique: true, validate: [VALIDATE_EMAIL_REG_EX, 'Email is incorrect'] })
+  @prop({ required: true, unique: true })
   public email: string;
 
-  @prop({ required: true, minlength: 6 })
+  @prop({ required: true })
   public password: string;
 
   @prop({ required: true, default: UserType.BASIC })

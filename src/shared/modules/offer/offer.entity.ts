@@ -1,8 +1,8 @@
 import { Collections, PropertyType } from '../../types/index.js';
 import { getModelForClass, prop, modelOptions, Ref } from '@typegoose/typegoose';
 import { BaseDocument } from '../base-document.js';
-import { CreateLocation } from './dtos/index.js';
 import { UserEntity } from '../user/index.js';
+import { LocationEntity } from './location.entity.js';
 
 @modelOptions({
   schemaOptions: {
@@ -17,10 +17,10 @@ export class OfferEntity extends BaseDocument {
   })
   public userId: Ref<UserEntity>;
 
-  @prop({ required: true, minlength: 10, maxlength: 100 })
+  @prop({ required: true })
   public name: string;
 
-  @prop({ required: true, minlength: 20, maxlength: 1024 })
+  @prop({ required: true })
   public description: string;
 
   @prop({ required: true })
@@ -41,30 +41,23 @@ export class OfferEntity extends BaseDocument {
   @prop({ default: false })
   public isPremium?: boolean;
 
-  @prop({ default: null })
-  public isFavourite?: boolean;
-
-  @prop({ default: null })
-  public commentsCount?: number;
-
   @prop({ required: true, default: PropertyType.apartment })
   public type: string;
 
-  @prop({ required: true, min: 1, max: 8, default: 1 })
+  @prop({ required: true, default: 1 })
   public bedrooms: number;
 
-  @prop({ required: true, min: 1, max: 10, default: 1 })
+  @prop({ required: true, default: 1 })
   public guests: number;
 
-  @prop({ min: 1, max: 5, default: 0 })
+  @prop({ default: 0 })
   public rating: number;
 
   @prop({ type: () => [String], required: true, default: [] })
   public facilities: string[];
 
-  // @TODO does not work
-  @prop({ type: () => CreateLocation, required: true, default: null})
-  public location: CreateLocation;
+  @prop({ type: () => LocationEntity, required: true, default: null, _id: false })
+  public location: LocationEntity;
 }
 
 export const OfferModel = getModelForClass(OfferEntity);

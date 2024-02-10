@@ -1,5 +1,4 @@
-import { City, Facility, PropertyType } from '../../../types/index.js';
-import { CreateLocation } from './create-location-dto.js';
+import { City, Facility, Location, PropertyType } from '../../../types/index.js';
 export class CreateOfferDto {
   public userId: string;
   public name: string;
@@ -13,6 +12,6 @@ export class CreateOfferDto {
   public bedrooms: number;
   public guests: number;
   public facilities: Facility[];
-  public location: CreateLocation;
+  public location: Location;
   public isPremium?: boolean;
 }

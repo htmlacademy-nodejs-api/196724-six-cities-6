@@ -5,17 +5,20 @@ import { inject, injectable } from 'inversify';
 import { Components } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { LoginUserDto, CreateUserDto } from './dtos/index.js';
+import { ApplicationSchema, IConfig } from '../../libs/config/index.js';
 
 @injectable()
 export class UserService implements IUserService {
   constructor(
     @inject(Components.UserModel) private readonly userModel: types.ModelType<UserEntity>,
-    @inject(Components.Logger) private readonly logger: ILogger
+    @inject(Components.Logger) private readonly logger: ILogger,
+    @inject(Components.Config) public readonly config: IConfig<ApplicationSchema>
   ) {}
 
-  public async create(dto: CreateUserDto, salt: string | undefined): Promise<DocumentType<UserEntity>> {
+  public async create(dto: CreateUserDto): Promise<DocumentType<UserEntity>> {
+    const salt = this.config.get('SALT');
     const user = new UserEntity(dto);
-    // @TODO get salt from config
+
     if (salt) {
       user.setPassword(salt);
       const result = await this.userModel.create(user);
