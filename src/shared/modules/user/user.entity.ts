@@ -19,6 +19,7 @@ export class UserEntity extends BaseDocument {
     this.type = data.type;
     this.avatarUrl = data.avatarUrl;
     this.password = data.password;
+    this.favourites = data.favourites;
   }
 
   @prop({ required: true, minlength: 1, maxlength: 15 })
@@ -35,6 +36,9 @@ export class UserEntity extends BaseDocument {
 
   @prop({ required: false, default: null })
   public avatarUrl?: string;
+
+  @prop({ type: () => [String], default: [] })
+  public favourites?: string[];
 
   public setPassword(salt: string) {
     this.password = getGeneratedSHA256(this.password, salt);

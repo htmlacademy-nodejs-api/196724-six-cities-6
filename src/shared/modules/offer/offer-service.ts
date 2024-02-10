@@ -1,12 +1,18 @@
+import mongoose from 'mongoose';
 import { DocumentType, types } from '@typegoose/typegoose';
 import { inject, injectable } from 'inversify';
-import {Collections, Components, SortType} from '../../types/index.js';
+import { Collections, Components, SortType } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { IOfferService } from './offer-service.interface.js';
 import { OfferEntity } from './offer.entity.js';
 import { CreateOfferDto, UpdateOfferDto } from './dtos/index.js';
+import { MAX_RETRIEVE_OFFERS, MAX_RETRIEVE_PREMIUM_OFFERS } from './offer-service.constants.js';
+import {
+  addedOfferExtraFields,
+  commentsLookupPipeline,
+  userFavouritesLookupPipeline
+} from './offer-service.pipelines.js';
 
-const MAX_RETRIEVE_OFFERS: number = 60;
 
 @injectable()
 export class OfferService implements IOfferService {
@@ -38,32 +44,51 @@ export class OfferService implements IOfferService {
 
   public async fetch(limit?: number): Promise<DocumentType<OfferEntity>[]> {
     return await this.offerModel.aggregate<DocumentType<OfferEntity>>([
-      { $lookup: {
-        from: Collections.comments,
-        let: { offerId: '$_id' }, // offer id from offers
-        pipeline: [
-          { $match: { $expr: { $eq: ['$offerId', '$$offerId'] } } },
-          { $project: { _id: 1, rating: 1 }}
-        ],
-        as: 'comments'
-      }},
-      { $addFields:
-          {
-            commentsCount: { $size: '$comments'},
-            rating: {
-              $avg: {
-                $map: {
-                  input: '$comments',
-                  as: 'comment',
-                  in: '$$comment.rating'
-                }
-              }
-            }
-          }
-      },
+      commentsLookupPipeline,
+      addedOfferExtraFields,
       { $unset: Collections.comments },
       { $limit: limit ?? MAX_RETRIEVE_OFFERS },
       { $sort: { postDate: SortType.Down }}
+    ]).exec();
+  }
+
+  public async findById(id: string): Promise<DocumentType<OfferEntity>> {
+    const result: DocumentType<OfferEntity>[] = await this.offerModel.aggregate<DocumentType<OfferEntity>>(
+      [
+        { $match: { _id: new mongoose.Types.ObjectId(id) } },
+        commentsLookupPipeline,
+        userFavouritesLookupPipeline,
+        addedOfferExtraFields,
+        { $addFields: { isFavourite: { $toBool: { $size: '$favourites'} }}},
+        { $unset: Collections.comments },
+        { $unset: Collections.users },
+        { $limit: 1 }
+      ]
+    ).exec();
+    return result[0];
+  }
+
+  public fetchPremiumByCity(city: string): Promise<DocumentType<OfferEntity>[]> {
+    return this.offerModel.aggregate<DocumentType<OfferEntity>>([
+      { $match: { city, isPremium: true } },
+      commentsLookupPipeline,
+      addedOfferExtraFields,
+      { $unset: Collections.comments },
+      { $limit: MAX_RETRIEVE_PREMIUM_OFFERS },
+      { $sort: { postDate: SortType.Down }}
+    ]).exec();
+  }
+
+  public fetchFavourites(): Promise<DocumentType<OfferEntity>[]> {
+    return this.offerModel.aggregate<DocumentType<OfferEntity>>([
+      commentsLookupPipeline,
+      userFavouritesLookupPipeline,
+      addedOfferExtraFields,
+      { $addFields: { isFavourite: { $toBool: { $size: '$favourites'} }}},
+      { $match: {isFavourite: true }},
+      { $unset: 'isFavourite' },
+      { $unset: Collections.comments },
+      { $unset: Collections.users },
     ]).exec();
   }
 }

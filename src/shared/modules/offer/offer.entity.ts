@@ -41,6 +41,12 @@ export class OfferEntity extends BaseDocument {
   @prop({ default: false })
   public isPremium?: boolean;
 
+  @prop({ default: null })
+  public isFavourite?: boolean;
+
+  @prop({ default: null })
+  public commentsCount?: number;
+
   @prop({ required: true, default: PropertyType.apartment })
   public type: string;
 

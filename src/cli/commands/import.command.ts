@@ -7,7 +7,7 @@ import { injectable } from 'inversify';
 import { DatabaseClient } from '../../shared/libs/database-client/index.js';
 import { UserModel, UserService} from '../../shared/modules/user/index.js';
 import { OfferModel, OfferService} from '../../shared/modules/offer/index.js';
-import { ConsoleLogger } from '../../shared/libs/logger/console.logger.js';
+import { ConsoleLogger } from '../../shared/libs/logger/index.js';
 
 @injectable()
 export class ImportCommand implements Command {

@@ -1,11 +1,10 @@
 import { DocumentType, types } from '@typegoose/typegoose';
-import { CreateUserDto} from './dtos/create-user-dto.js';
 import { UserEntity } from './user.entity.js';
 import { IUserService } from './user-service.interface.js';
 import { inject, injectable } from 'inversify';
 import { Components } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
-import { LoginUserDto } from './dtos/index.js';
+import { LoginUserDto, CreateUserDto } from './dtos/index.js';
 
 @injectable()
 export class UserService implements IUserService {
@@ -41,12 +40,19 @@ export class UserService implements IUserService {
   }
 
   // @TODO just a placeholder method
-  public async logout(): Promise<string> {
-    return Promise.resolve('true');
+  public async check(): Promise<DocumentType<UserEntity> | null>{
+    return Promise.resolve(null);
   }
 
-  // @TODO just a placeholder method
-  public async ping(): Promise<DocumentType<UserEntity> | null>{
-    return Promise.resolve(null);
+  public addFavouriteOffer(id: string, offerId: string): Promise<DocumentType<UserEntity> | null> {
+    return this.userModel.findByIdAndUpdate(
+      id,
+      { $addToSet: { favourites: offerId } },
+      { new: true }
+    );
+  }
+
+  public removeFavouriteOffer(id: string, offerId: string): Promise<DocumentType<UserEntity> | null> {
+    return this.userModel.findByIdAndUpdate(id, { $unset: { favourites: offerId } }, { new: true });
   }
 }

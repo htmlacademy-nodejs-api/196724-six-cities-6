@@ -8,5 +8,6 @@ export type User = {
   email: string,
   password: string,
   type: UserType,
-  avatarUrl?: string
+  avatarUrl?: string,
+  favourites?: string[],
 }

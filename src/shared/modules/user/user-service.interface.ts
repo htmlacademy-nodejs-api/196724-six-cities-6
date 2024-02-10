@@ -7,4 +7,6 @@ export interface IUserService {
   findById(id: string): Promise<DocumentType<UserEntity> | null>;
   login(dto: LoginUserDto): Promise<string>;
   check(): Promise<DocumentType<UserEntity> | null>;
+  addFavouriteOffer(id: string, offerId: string): Promise<DocumentType<UserEntity> | null>;
+  removeFavouriteOffer(id: string, offerId: string): Promise<DocumentType<UserEntity> | null>;
 }

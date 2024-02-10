@@ -1,10 +1,11 @@
 import { DocumentType, types } from '@typegoose/typegoose';
 import { inject, injectable } from 'inversify';
-import { Components } from '../../types/index.js';
+import { Components, SortType } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { ICommentService } from './comment-service.interface.js';
 import { CreateCommentDto } from './dtos/index.js';
 import { CommentEntity } from './comment.entity.js';
+import { MAX_RETRIEVE_COMMENTS } from './comment-service.constants.js';
 
 @injectable()
 export class CommentService implements ICommentService {
@@ -14,8 +15,15 @@ export class CommentService implements ICommentService {
   ) {}
 
   public async create(dto: CreateCommentDto): Promise<DocumentType<CommentEntity>> {
-    const result = await this.commentModel.create(dto);
+    const result: DocumentType<CommentEntity> = await this.commentModel.create(dto);
     this.logger.info('New comment created!');
     return result;
+  }
+
+  public fetchByOfferId(id: string): Promise<DocumentType<CommentEntity>[]> {
+    return this.commentModel.find(
+      { offerId: id },
+      null,
+      { limit: MAX_RETRIEVE_COMMENTS, sort: { publishDate: SortType.Down } });
   }
 }
