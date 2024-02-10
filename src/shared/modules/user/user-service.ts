@@ -12,11 +12,11 @@ export class UserService implements IUserService {
   constructor(
     @inject(Components.UserModel) private readonly userModel: types.ModelType<UserEntity>,
     @inject(Components.Logger) private readonly logger: ILogger,
-    @inject(Components.Config) public readonly config: IConfig<ApplicationSchema>
+    @inject(Components.Config) public readonly config?: IConfig<ApplicationSchema>
   ) {}
 
   public async create(dto: CreateUserDto): Promise<DocumentType<UserEntity>> {
-    const salt = this.config.get('SALT');
+    const salt = this.config && this.config.get('SALT');
     const user = new UserEntity(dto);
 
     if (salt) {

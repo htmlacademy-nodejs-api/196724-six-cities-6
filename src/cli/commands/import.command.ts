@@ -9,15 +9,13 @@ import { UserModel, UserService} from '../../shared/modules/user/index.js';
 import { OfferModel, OfferService} from '../../shared/modules/offer/index.js';
 import { ConsoleLogger } from '../../shared/libs/logger/index.js';
 import { CommentModel } from '../../shared/modules/comment/index.js';
-import { ApplicationSchema, Config, IConfig } from '../../shared/libs/config/index.js';
 
 @injectable()
 export class ImportCommand implements Command {
   private offersCount: number = 0;
 
   private consoleLogger: ConsoleLogger = new ConsoleLogger();
-  private config: IConfig<ApplicationSchema> = new Config(this.consoleLogger);
-  private userService: UserService = new UserService(UserModel, this.consoleLogger, this.config);
+  private userService: UserService = new UserService(UserModel, this.consoleLogger);
   private offerService: OfferService = new OfferService(OfferModel, CommentModel, UserModel, this.consoleLogger);
   private databaseClient: DatabaseClient = new DatabaseClient(this.consoleLogger);
 
