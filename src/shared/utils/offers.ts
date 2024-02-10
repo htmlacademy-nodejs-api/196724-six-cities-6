@@ -8,8 +8,7 @@ export const getLocation = (location: string): Location => {
 export const mapToOffer = (data: string): Offer => {
   const [
     name, description, postDate, city, price,
-    previewUrl, urls, isPremium, isFavourite,
-    rating, type, bedrooms, guests, facilities,
+    previewUrl, urls, isPremium, type, bedrooms, guests, facilities,
     userId, location
   ] = data.replace('\n', '').split('\t');
   return {
@@ -20,8 +19,6 @@ export const mapToOffer = (data: string): Offer => {
     previewUrl,
     urls: urls.split(','),
     isPremium: !!Number(isPremium),
-    isFavourite: !!Number(isFavourite),
-    rating: Number(rating),
     price: Number.parseInt(price, 10),
     type: type as PropertyType,
     bedrooms: Number(bedrooms),

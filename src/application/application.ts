@@ -6,15 +6,13 @@ import { Components } from '../shared/types/index.js';
 import { IDatabaseClient } from '../shared/libs/database-client/index.js';
 import { getMongoUrl } from '../shared/utils/database.js';
 
-
 @injectable()
 export class Application implements IApplication {
   constructor(
     @inject(Components.Logger) private readonly logger: ILogger,
     @inject(Components.Config) private readonly config: IConfig<ApplicationSchema>,
     @inject(Components.DatabaseClient) private readonly databaseClient: IDatabaseClient,
-  ) {
-  }
+  ) {}
 
   private initializeDatabase() {
     const url = getMongoUrl({

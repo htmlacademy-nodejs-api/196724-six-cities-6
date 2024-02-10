@@ -13,8 +13,6 @@ const MIN_BEDROOMS = 1;
 const MAX_BEDROOMS = 8;
 const MIN_GUESTS = 1;
 const MAX_GUESTS = 10;
-const MIN_RATING = 1;
-const MAX_RATING = 8;
 const MIN_FACILITIES = 1;
 const MIN_LONG_LAT = -180;
 const MAX_LONG_LAT = 180;
@@ -36,8 +34,6 @@ export class TsvOfferGenerator implements OfferGenerator {
     const previewUrl = getRandomItem(this.offersData.urls);
     const urls = getSlicedRandomArray(this.offersData.urls).join(',');
     const isPremium = getRandomNumber(0, 1);
-    const isFavourite = getRandomNumber(0, 1);
-    const rating = getRandomNumber(MIN_RATING, MAX_RATING);
     const type = getRandomItem(allPropertyTypes);
     const bedrooms = getRandomNumber(MIN_BEDROOMS, MAX_BEDROOMS);
     const guests = getRandomNumber(MIN_GUESTS, MAX_GUESTS);
@@ -47,7 +43,7 @@ export class TsvOfferGenerator implements OfferGenerator {
 
     return [
       name, description, postData, city, price, previewUrl, urls, isPremium,
-      isFavourite, rating, type, bedrooms, guests, facilities, userId, location
+      type, bedrooms, guests, facilities, userId, location
     ].join('\t');
   }
 }

@@ -107,6 +107,63 @@ paths:
           description: A user with this id not found.
         "401":
           description: The user does’t have valid authentication credentials to get the requested resource.
+  /users/{id}/offers/favourite/add:
+    post:
+      tags:
+        - USERS
+      summary: Manage a user favourite offers list.
+      description: Adding an offer from a user favourite list.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: User id.
+      requestBody:
+        description: Add user favourite offer.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserFavouriteOfferAddRequest'
+        required: true
+      responses:
+        "200":
+          description: Offer has been added.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/User'
+        "404":
+          description: Offer not found.
+  /users/{id}/offers/favourite/delete:
+    delete:
+      tags:
+        - USERS
+      summary: Manage a user favourite offers list.
+      description: Deleting an offer from a user favourite list.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: User id.
+        - in: query
+          name: offerId
+          schema:
+            type: string
+          required: true
+          description: Offer id.
+      responses:
+        "200":
+          description: Offer has been added or deleted.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/User'
+        "404":
+          description: Offer not found.
 
   /offers/create:
     post:
@@ -263,29 +320,6 @@ paths:
                   $ref: '#/components/schemas/Offer'
         "404":
           description: Offers not found.
-  /offers/favourite/update:
-    post:
-      tags:
-        - OFFERS
-      summary: Manage a user favourite offers list.
-      description: Allows adding or deleting an offer from a user favourite list.
-      requestBody:
-        description: Update a user favourite offers data.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserFavouriteOffersRequest'
-        required: true
-      responses:
-        "200":
-          description: Offer has been added or deleted.
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: true
-        "404":
-          description: Offer not found.
 
   /comments/offers/{id}:
     get:
@@ -398,7 +432,7 @@ components:
         updatedAt:
           type: string
           example: 2020-07-10
-    UserFavouriteOffersRequest:
+    UserFavouriteOfferAddRequest:
       type: object
       properties:
         offerId:

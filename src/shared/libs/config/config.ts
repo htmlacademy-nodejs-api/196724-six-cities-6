@@ -1,6 +1,6 @@
 import { IConfig } from './config.interface.js';
 import { config } from 'dotenv';
-import { Logger} from '../logger/index.js';
+import { ILogger } from '../logger/index.js';
 import { configApplicationSchema } from './application-schema.js';
 import { inject, injectable } from 'inversify';
 import { Components } from '../../types/index.js';
@@ -11,7 +11,7 @@ export class Config implements IConfig<ApplicationSchema> {
   private readonly config: ApplicationSchema;
 
   constructor(
-    @inject(Components.Logger) private readonly logger: Logger
+    @inject(Components.Logger) private readonly logger: ILogger
   ) {
     const { error, parsed } = config();
 

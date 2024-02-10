@@ -1,13 +1,11 @@
-import { User, UserType } from '../../types/index.js';
+import { Collections, User, UserType } from '../../types/index.js';
 import { getModelForClass, prop, modelOptions } from '@typegoose/typegoose';
 import { getGeneratedSHA256 } from '../../utils/index.js';
 import { BaseDocument } from '../base-document.js';
 
-const VALIDATE_EMAIL_REG_EX = /^([\w-\\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
-
 @modelOptions({
   schemaOptions: {
-    collection: 'users',
+    collection: Collections.users,
     timestamps: true,
   }
 })
@@ -19,15 +17,16 @@ export class UserEntity extends BaseDocument {
     this.type = data.type;
     this.avatarUrl = data.avatarUrl;
     this.password = data.password;
+    this.favourites = data.favourites;
   }
 
-  @prop({ required: true, minlength: 1, maxlength: 15 })
+  @prop({ required: true })
   public name: string;
 
-  @prop({ required: true, unique: true, validate: [VALIDATE_EMAIL_REG_EX, 'Email is incorrect'] })
+  @prop({ required: true, unique: true })
   public email: string;
 
-  @prop({ required: true, minlength: 6 })
+  @prop({ required: true })
   public password: string;
 
   @prop({ required: true, default: UserType.BASIC })
@@ -35,6 +34,9 @@ export class UserEntity extends BaseDocument {
 
   @prop({ required: false, default: null })
   public avatarUrl?: string;
+
+  @prop({ type: () => [String], default: [] })
+  public favourites?: string[];
 
   public setPassword(salt: string) {
     this.password = getGeneratedSHA256(this.password, salt);

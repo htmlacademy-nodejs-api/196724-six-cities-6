@@ -7,15 +7,18 @@ import { injectable } from 'inversify';
 import { DatabaseClient } from '../../shared/libs/database-client/index.js';
 import { UserModel, UserService} from '../../shared/modules/user/index.js';
 import { OfferModel, OfferService} from '../../shared/modules/offer/index.js';
-import { ConsoleLogger } from '../../shared/libs/logger/console.logger.js';
+import { ConsoleLogger } from '../../shared/libs/logger/index.js';
+import { CommentModel } from '../../shared/modules/comment/index.js';
+import { ApplicationSchema, Config, IConfig } from '../../shared/libs/config/index.js';
 
 @injectable()
 export class ImportCommand implements Command {
   private offersCount: number = 0;
 
   private consoleLogger: ConsoleLogger = new ConsoleLogger();
-  private userService: UserService = new UserService(UserModel, this.consoleLogger);
-  private offerService: OfferService = new OfferService(OfferModel, this.consoleLogger);
+  private config: IConfig<ApplicationSchema> = new Config(this.consoleLogger);
+  private userService: UserService = new UserService(UserModel, this.consoleLogger, this.config);
+  private offerService: OfferService = new OfferService(OfferModel, CommentModel, UserModel, this.consoleLogger);
   private databaseClient: DatabaseClient = new DatabaseClient(this.consoleLogger);
 
 
@@ -24,7 +27,7 @@ export class ImportCommand implements Command {
   }
 
   private onImportedLine = async (line: string, resolve: () => void): Promise<void> => {
-    const offer = mapToOffer(line);
+    const offer: Offer = mapToOffer(line);
     await this.saveOffer(offer);
     resolve();
   };
@@ -63,7 +66,7 @@ export class ImportCommand implements Command {
       });
       await this.databaseClient.connect(url);
 
-      const fileReader = new TSVFileReader(filename.trim());
+      const fileReader: TSVFileReader = new TSVFileReader(filename.trim());
 
       fileReader.on(Events.line, this.onImportedLine);
       fileReader.on(Events.end, this.onCompleteImport);
