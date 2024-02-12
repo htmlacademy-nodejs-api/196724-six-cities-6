@@ -6,7 +6,7 @@ import { Components } from '../../types/index.js';
 import { ILogger, Logger, ConsoleLogger } from '../logger/index.js';
 import { ApplicationSchema, Config, IConfig } from '../config/index.js';
 import { DatabaseClient, IDatabaseClient } from '../database-client/index.js';
-import { IUserService, UserEntity, UserModel, UserService } from '../../modules/user/index.js';
+import { IUserService, UserController, UserEntity, UserModel, UserService } from '../../modules/user/index.js';
 import { types } from '@typegoose/typegoose';
 import { IOfferService, OfferEntity, OfferModel, OfferService } from '../../modules/offer/index.js';
 import {
@@ -19,12 +19,19 @@ import {
   VersionCommand
 } from '../../../cli/index.js';
 import { ICommentService, CommentService, CommentEntity, CommentModel } from '../../modules/comment/index.js';
+import { IController } from '../controller/index.js';
+import { ExceptionFilter, IExceptionFilter } from '../exeption-filter/index.js';
+import { OfferController } from '../../modules/offer/offer.controller.js';
 
+// @TODO need to refactor the class
 export class InversifyContainer extends Container implements IInversifyContainer {
   public initMainApplication() {
     this.bind<IApplication>(Components.Application).to(Application).inSingletonScope();
     this.bind<ILogger>(Components.Logger).to(Logger).inSingletonScope();
     this.bind<IConfig<ApplicationSchema>>(Components.Config).to(Config).inSingletonScope();
+    this.bind<IController>(Components.UserController).to(UserController).inSingletonScope();
+    this.bind<IController>(Components.OfferController).to(OfferController).inSingletonScope();
+    this.bind<IExceptionFilter>(Components.ExceptionFilter).to(ExceptionFilter).inSingletonScope();
     this.initDataBaseEntities();
   }
 

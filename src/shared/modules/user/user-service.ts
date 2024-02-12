@@ -6,6 +6,7 @@ import { Components } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { LoginUserDto, CreateUserDto } from './dtos/index.js';
 import { ApplicationSchema, IConfig } from '../../libs/config/index.js';
+import { getGeneratedSHA256 } from '../../utils/index.js';
 
 @injectable()
 export class UserService implements IUserService {
@@ -15,12 +16,15 @@ export class UserService implements IUserService {
     @inject(Components.Config) public readonly config?: IConfig<ApplicationSchema>
   ) {}
 
+  get salt() {
+    return this.config && this.config.get('SALT');
+  }
+
   public async create(dto: CreateUserDto): Promise<DocumentType<UserEntity>> {
-    const salt = this.config && this.config.get('SALT');
     const user = new UserEntity(dto);
 
-    if (salt) {
-      user.setPassword(salt);
+    if (this.salt) {
+      user.setPassword(this.salt);
       const result = await this.userModel.create(user);
       this.logger.info(`New user created: ${user.email}`);
       return result;
@@ -30,16 +34,29 @@ export class UserService implements IUserService {
   }
 
   public async findById(id: string): Promise<DocumentType<UserEntity> | null> {
-    const user = this.userModel.findOne({ _id: id }).exec();
+    const user = this.userModel.findById(id).exec();
     if (user) {
       return user;
     }
     throw Error(`User with id: ${id} has not been found!`);
   }
 
+  public async findByEmail(email: string): Promise<DocumentType<UserEntity> | null> {
+    const user = this.userModel.findOne({ email }).exec();
+    if (user) {
+      return user;
+    }
+    throw Error(`User with id: ${email} has not been found!`);
+  }
+
   // @TODO just a placeholder method
-  public async login(dto: LoginUserDto): Promise<string> {
-    return Promise.resolve(dto.email);
+  public async login(dto: LoginUserDto): Promise<DocumentType<UserEntity> | null> {
+    if(this.salt) {
+      const password = getGeneratedSHA256(dto.password, this.salt);
+      return this.userModel.findOne({ email: dto.email, password });
+
+    }
+    throw Error('SALT not found in application config');
   }
 
   // @TODO just a placeholder method

@@ -1,3 +1,5 @@
+import { ClassConstructor, plainToInstance } from 'class-transformer';
+
 export const getMongoUrl = (
   args: {
     username: string,
@@ -23,3 +25,13 @@ export const retryConnection = async (options: {callback: () => Promise<void>, o
     }
   }
 };
+
+export function fillDto<T, V>(someDto: ClassConstructor<T>, plainObject: V) {
+  return plainToInstance(someDto, plainObject, { excludeExtraneousValues: true, exposeUnsetFields: false });
+}
+
+export function createErrorObject(message: string) {
+  return {
+    error: message,
+  };
+}

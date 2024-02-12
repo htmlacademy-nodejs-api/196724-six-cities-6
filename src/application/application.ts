@@ -2,10 +2,12 @@ import { IApplication } from './application.interface.js';
 import { ILogger } from '../shared/libs/logger/index.js';
 import { ApplicationSchema, IConfig } from '../shared/libs/config/index.js';
 import { inject, injectable } from 'inversify';
-import { Components } from '../shared/types/index.js';
 import { IDatabaseClient } from '../shared/libs/database-client/index.js';
 import { getMongoUrl } from '../shared/utils/database.js';
 import express, {Express} from 'express';
+import { ApplicationRoutes, IController } from '../shared/libs/controller/index.js';
+import { Components } from '../shared/types/index.js';
+import { IExceptionFilter } from '../shared/libs/exeption-filter/index.js';
 
 @injectable()
 export class Application implements IApplication {
@@ -14,6 +16,9 @@ export class Application implements IApplication {
     @inject(Components.Logger) private readonly logger: ILogger,
     @inject(Components.Config) private readonly config: IConfig<ApplicationSchema>,
     @inject(Components.DatabaseClient) private readonly databaseClient: IDatabaseClient,
+    @inject(Components.UserController) private readonly userController: IController,
+    @inject(Components.OfferController) private readonly offerController: IController,
+    @inject(Components.ExceptionFilter) private readonly exceptionFilter: IExceptionFilter,
   ) {
     this.server = express();
   }
@@ -38,6 +43,15 @@ export class Application implements IApplication {
     this.server.use(express.json());
   }
 
+  private async initializeControllers() {
+    this.server.use(ApplicationRoutes.users, this.userController.router);
+    this.server.use(ApplicationRoutes.offers, this.offerController.router);
+  }
+
+  private async initializeExceptionFilters() {
+    this.server.use(this.exceptionFilter.catch.bind(this.exceptionFilter));
+  }
+
   public async init() {
     this.logger.info('Init application ...');
 
@@ -48,6 +62,15 @@ export class Application implements IApplication {
     this.logger.info('Init app-level middleware ...');
     await this.initializeMiddleware();
     this.logger.info('App-level middleware initialization completed!');
+
+    this.logger.info('Init controllers ...');
+    await this.initializeControllers();
+    this.logger.info('Controller initialization completed!');
+
+
+    this.logger.info('Init exception filters ...');
+    await this.initializeExceptionFilters();
+    this.logger.info('Exception filters initialization completed!');
 
     this.logger.info('Try to init serve ...');
     await this.initializeServer();

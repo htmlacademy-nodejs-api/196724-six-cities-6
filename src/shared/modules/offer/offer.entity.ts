@@ -11,6 +11,10 @@ import { LocationEntity } from './location.entity.js';
   }
 })
 export class OfferEntity extends BaseDocument {
+  constructor() {
+    super();
+  }
+
   @prop({
     ref: UserEntity,
     required: true,
@@ -50,13 +54,10 @@ export class OfferEntity extends BaseDocument {
   @prop({ required: true, default: 1 })
   public guests: number;
 
-  @prop({ default: 0 })
-  public rating: number;
-
   @prop({ type: () => [String], required: true, default: [] })
   public facilities: string[];
 
-  @prop({ type: () => LocationEntity, required: true, default: null, _id: false })
+  @prop({ type: () => LocationEntity, required: true, default: undefined, _id: false })
   public location: LocationEntity;
 }
 

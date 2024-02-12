@@ -32,10 +32,10 @@ export class UserEntity extends BaseDocument {
   @prop({ required: true, default: UserType.BASIC })
   public type: UserType;
 
-  @prop({ required: false, default: null })
+  @prop({ required: false, default: undefined })
   public avatarUrl?: string;
 
-  @prop({ type: () => [String], default: [] })
+  @prop({ type: () => [String], default: undefined })
   public favourites?: string[];
 
   public setPassword(salt: string) {
