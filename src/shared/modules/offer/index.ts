@@ -6,3 +6,5 @@ export * from './dtos/index.js';
 export * from './rdos/index.js';
 export * from './types/index.js';
 export * from './offer-service.pipelines.js';
+export * from './offer.container.js';
+export * from './offer.controller.js';

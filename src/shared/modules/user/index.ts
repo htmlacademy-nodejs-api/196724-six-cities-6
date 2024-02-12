@@ -5,3 +5,4 @@ export * from './types/index.js';
 export * from './user-service.interface.js';
 export * from './user-service.js';
 export * from './user.controller.js';
+export * from './user.container.js';

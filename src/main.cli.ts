@@ -1,11 +1,13 @@
 #!/usr/bin/env node
-import { InversifyContainer } from './shared/libs/inversify-container/index.js';
+import 'reflect-metadata';
+import { createCliApplicationContainer, ICliApplication } from './cli/index.js';
+import { Components } from './shared/types/index.js';
 
-const container = new InversifyContainer();
 function bootstrap() {
-  container.initCliApplication();
-  container.cliApplication.registerCommands();
-  container.cliApplication.processCommand(process.argv);
+  const cliApplicationContainer = createCliApplicationContainer();
+  const cliApplication = cliApplicationContainer.get<ICliApplication>(Components.CliApplication);
+  cliApplication.registerCommands();
+  cliApplication.processCommand(process.argv);
 }
 
 bootstrap();
