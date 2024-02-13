@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { Components } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 
-import {CreateOffersRequestType, GetOffersRequestType, PatchOffersRequestType} from './types/index.js';
+import { CreateOffersRequestType, GetOffersRequestType, PatchOffersRequestType } from './types/index.js';
 
 import { IOfferService } from './offer-service.interface.js';
 import { Response } from 'express';
@@ -32,16 +32,19 @@ export class OfferController extends Controller {
   }
 
   public async getAll(req: GetOffersRequestType, res: Response) {
-    const { query: { limit}} = req;
+    const { query: { limit: _limit}} = req;
 
-    if (isNumber(limit)) {
-      const offers = await this.offerService.fetch(limit as unknown as number);
+    const isValidLimit: boolean = _limit ? isNumber(_limit) : true;
+
+    if (isValidLimit) {
+      const limit = _limit ? Number(_limit) : undefined;
+      const offers = await this.offerService.fetch(limit);
       return this.success(res, fillDto(OfferLiteRdo, offers));
     }
 
     throw new HttpError(
       StatusCodes.BAD_REQUEST,
-      `Limit «${limit}» is not a integer.`,
+      `Limit ${_limit} is not a number.`,
       'OfferController'
     );
   }

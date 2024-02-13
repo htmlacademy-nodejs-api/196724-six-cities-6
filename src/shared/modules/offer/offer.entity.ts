@@ -1,8 +1,7 @@
-import { Collections, PropertyType } from '../../types/index.js';
+import { Collections, Location, PropertyType } from '../../types/index.js';
 import { getModelForClass, prop, modelOptions, Ref } from '@typegoose/typegoose';
 import { BaseDocument } from '../base-document.js';
 import { UserEntity } from '../user/index.js';
-import { LocationEntity } from './location.entity.js';
 
 @modelOptions({
   schemaOptions: {
@@ -57,8 +56,8 @@ export class OfferEntity extends BaseDocument {
   @prop({ type: () => [String], required: true, default: [] })
   public facilities: string[];
 
-  @prop({ type: () => LocationEntity, required: true, default: undefined, _id: false })
-  public location: LocationEntity;
+  @prop({ required: true, default: undefined, _id: false })
+  public location: Location;
 }
 
 export const OfferModel = getModelForClass(OfferEntity);

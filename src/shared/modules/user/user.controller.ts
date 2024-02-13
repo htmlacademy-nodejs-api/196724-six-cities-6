@@ -72,7 +72,6 @@ export class UserController extends Controller{
 
   public async getById(req: GetUserRequest, res: Response) {
     const result = await this.userService.findById(req.params.id);
-    console.log(result?.id);
     if (result){
       return this.success(res, fillDto(UserRdo, result));
     }

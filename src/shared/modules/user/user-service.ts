@@ -73,6 +73,6 @@ export class UserService implements IUserService {
   }
 
   public removeFavouriteOffer(id: string, offerId: string): Promise<DocumentType<UserEntity> | null> {
-    return this.userModel.findByIdAndUpdate(id, { $unset: { favourites: offerId } }, { new: true });
+    return this.userModel.findByIdAndUpdate(id, { $pull: { favourites: offerId } }, { new: true });
   }
 }
