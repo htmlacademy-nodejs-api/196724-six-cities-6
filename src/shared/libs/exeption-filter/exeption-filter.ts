@@ -12,7 +12,7 @@ export class ExceptionFilter implements IExceptionFilter {
   constructor(
     @inject(Components.Logger) private readonly logger: ILogger
   ) {
-    this.logger.info('Register AppExceptionFilter');
+    this.logger.info('Register ExceptionFilter');
   }
 
   private handleHttpError(error: HttpError, _req: Request, res: Response, _next: NextFunction) {

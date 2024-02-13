@@ -39,7 +39,10 @@ export class OfferController extends Controller {
     if (isValidLimit) {
       const limit = _limit ? Number(_limit) : undefined;
       const offers = await this.offerService.fetch(limit);
-      return this.success(res, fillDto(OfferLiteRdo, offers));
+      if (offers.length) {
+        return this.success(res, fillDto(OfferLiteRdo, offers));
+      }
+      return this.noContent(res, fillDto(OfferLiteRdo, offers));
     }
 
     throw new HttpError(
@@ -67,8 +70,11 @@ export class OfferController extends Controller {
     const { query: { city}} = req;
 
     if(typeof city === 'string') {
-      const result = await this.offerService.fetchPremiumByCity(city);
-      return this.success(res, fillDto(OfferRdo, result));
+      const offers = await this.offerService.fetchPremiumByCity(city);
+      if (offers.length) {
+        return this.success(res, fillDto(OfferLiteRdo, offers));
+      }
+      return this.noContent(res, fillDto(OfferLiteRdo, offers));
     }
     throw new HttpError(
       StatusCodes.BAD_REQUEST,
@@ -78,8 +84,11 @@ export class OfferController extends Controller {
   }
 
   public async getFavourites(_req: GetOffersRequestType, res: Response) {
-    const result = await this.offerService.fetchFavourites();
-    return this.success(res, fillDto(OfferRdo, result));
+    const offers = await this.offerService.fetchFavourites();
+    if (offers.length) {
+      return this.success(res, fillDto(OfferLiteRdo, offers));
+    }
+    return this.noContent(res, fillDto(OfferLiteRdo, offers));
   }
 
   public async delete(req: GetOffersRequestType, res: Response) {
