@@ -101,7 +101,7 @@ export class OfferController extends Controller {
     const { body} = req;
 
     const result = await this.offerService.create(body);
-    return this.success(res, fillDto(OfferRdo, result));
+    return this.created(res, fillDto(OfferRdo, result));
   }
 
   public async patch(req: PatchOffersRequestType, res: Response) {
