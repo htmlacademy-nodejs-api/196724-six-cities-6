@@ -6,12 +6,14 @@ import { ILogger } from '../../libs/logger/index.js';
 import { CreateOffersRequestType, GetOffersRequestType, PatchOffersRequestType } from './types/index.js';
 
 import { IOfferService } from './offer-service.interface.js';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { fillDto, isNumber } from '../../utils/index.js';
 
 import { OfferLiteRdo, OfferRdo } from './rdos/index.js';
 import { HttpError } from '../../libs/exeption-filter/index.js';
 import { StatusCodes } from 'http-status-codes';
+import { GetOfferRequestType } from './types/get-offer-request.type.js';
+import { GetPremiumOffersRequest } from './types/get-premium-offers-request.type.js';
 
 @injectable()
 export class OfferController extends Controller {
@@ -52,7 +54,7 @@ export class OfferController extends Controller {
     );
   }
 
-  public async getById(req: GetOffersRequestType, res: Response) {
+  public async getById(req: GetOfferRequestType, res: Response) {
     const { params: { id }} = req;
     const offer = await this.offerService.findById(id);
     if (offer) {
@@ -66,7 +68,7 @@ export class OfferController extends Controller {
     );
   }
 
-  public async getPremiumByCity(req: GetOffersRequestType, res: Response) {
+  public async getPremiumByCity(req: GetPremiumOffersRequest, res: Response) {
     const { query: { city}} = req;
 
     if(typeof city === 'string') {
@@ -83,7 +85,7 @@ export class OfferController extends Controller {
     );
   }
 
-  public async getFavourites(_req: GetOffersRequestType, res: Response) {
+  public async getFavourites(_req: Request, res: Response) {
     const offers = await this.offerService.fetchFavourites();
     if (offers.length) {
       return this.success(res, fillDto(OfferLiteRdo, offers));

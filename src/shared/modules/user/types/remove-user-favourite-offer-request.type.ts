@@ -1,4 +1,4 @@
 import { Request } from 'express';
-import {RequestBody, RequestParams} from '../../../libs/controller/index.js';
+import { RequestParams } from '../../../libs/controller/index.js';
 
-export type RemoveUserFavouriteOfferRequest = Request<RequestParams, RequestBody>;
+export type RemoveUserFavouriteOfferRequest = Request<RequestParams<{ id: string, offerId: string }>>;

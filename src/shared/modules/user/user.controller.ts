@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { Components } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { IUserService } from './user-service.interface.js';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { fillDto } from '../../utils/index.js';
 import { UserRdo } from './rdos/index.js';
 import {
@@ -15,12 +15,14 @@ import {
 } from './types/index.js';
 import { HttpError } from '../../libs/exeption-filter/index.js';
 import { StatusCodes } from 'http-status-codes';
+import { IOfferService } from '../offer/index.js';
 
 @injectable()
 export class UserController extends Controller{
   constructor(
     @inject(Components.Logger) protected readonly logger: ILogger,
     @inject(Components.UserService) private readonly userService: IUserService,
+    @inject(Components.OfferService) private readonly offerService: IOfferService,
   ) {
     super(logger);
     this.logger.info('Register routes for UserController ...');
@@ -63,7 +65,7 @@ export class UserController extends Controller{
     );
   }
 
-  public async check(req: Request, res: Response) {
+  public async check(req: GetUserRequest, res: Response) {
     // @TODO not completed yet
     const result = await this.userService.findById(req.params.id);
     this.success(res, fillDto(UserRdo, result));
@@ -85,8 +87,18 @@ export class UserController extends Controller{
 
   public async addFavouriteOffer(req: AddUserFavouriteOfferRequest, res: Response) {
     const { body} = req;
-    const result = await this.userService.addFavouriteOffer(req.params.id, body.offerId);
-    this.success(res, fillDto(UserRdo, result));
+    const requiredOffer = await this.offerService.findById(body.offerId);
+
+    if (requiredOffer) {
+      const result = await this.userService.addFavouriteOffer(req.params.id, body.offerId);
+      this.success(res, fillDto(UserRdo, result));
+    } else {
+      throw new HttpError(
+        StatusCodes.BAD_REQUEST,
+        `Offer with id «${body.offerId}» does not exists and can not be add as a user favourite one.`,
+        'UserController'
+      );
+    }
   }
 
   public async removeFavouriteOffer(req: RemoveUserFavouriteOfferRequest, res: Response) {
