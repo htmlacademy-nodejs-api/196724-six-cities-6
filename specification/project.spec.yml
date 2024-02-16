@@ -136,7 +136,7 @@ paths:
                 $ref: '#/components/schemas/User'
         "404":
           description: Offer not found.
-  /users/{id}/offers/favourite/delete:
+  /users/{id}/offers/favourite/{offerId}/remove:
     delete:
       tags:
         - USERS
@@ -149,7 +149,7 @@ paths:
             type: string
           required: true
           description: User id.
-        - in: query
+        - in: path
           name: offerId
           schema:
             type: string
@@ -187,12 +187,19 @@ paths:
                 $ref: '#/components/schemas/Offer'
         "400":
           description: Not valid data.
-  /offers/patch:
+  /offers/patch/{id}:
     patch:
       tags:
         - OFFERS
       summary: An offer update.
       description: Allows updating an existing offer based on request body data.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Offer id.
       requestBody:
         description: Update offer data.
         content:

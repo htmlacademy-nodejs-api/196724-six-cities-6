@@ -9,5 +9,5 @@ export interface IOfferService {
   fetch(limit?: number): Promise<DocumentType<OfferEntity>[]>;
   fetchPremiumByCity(city: string): Promise<DocumentType<OfferEntity>[]>;
   fetchFavourites(): Promise<DocumentType<OfferEntity>[]>;
-  findById(id: string): Promise<DocumentType<OfferEntity>>;
+  findById(id: string): Promise<DocumentType<OfferEntity> | null>;
 }

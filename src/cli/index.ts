@@ -7,3 +7,4 @@ export * from './commands/generate.command.js';
 export * from './command-parser.js';
 export * from './cli-application.js';
 export * from './cli-application.interface.js';
+export * from './cli-application.container.js';

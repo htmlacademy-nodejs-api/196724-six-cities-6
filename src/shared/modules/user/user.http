@@ -1,0 +1,35 @@
+### Getting user by :id
+GET http://localhost:4000/users/65c0bf5135a2c753f9298e63
+Accept: application/json
+
+### Create a new user
+POST http://localhost:4000/users/create
+Content-Type: application/json
+
+{
+  "name": "Test1",
+  "email": "test1@test.com",
+  "type": "pro",
+  "password": "123qwe"
+}
+
+### Login an existing new user
+POST http://localhost:4000/users/login
+Content-Type: application/json
+
+{
+  "email": "test1@test.com",
+  "password": "123qwe"
+}
+
+### Adding an user offer
+POST http://localhost:4000/users/65c0bf5135a2c753f9298e63/offers/favourite/add
+Content-Type: application/json
+
+{
+  "offerId": "65caa630ae538f90a64b3c9a"
+}
+
+### Removing an user offer
+DELETE http://localhost:4000/users/65c0bf5135a2c753f9298e63/offers/favourite/65caa630ae538f90a64b3c9a/remove
+Content-Type: application/json

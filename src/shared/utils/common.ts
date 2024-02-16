@@ -29,3 +29,5 @@ export const getSlicedRandomArray = (arr: string[], max?: number): string[] => {
 };
 
 export const getRandomIsoDate = () => DateTime.fromObject({ ordinal: getRandomNumber(1, 365) }).toISODate();
+
+export const isNumber = (value: unknown): boolean => !isNaN(Number(value));

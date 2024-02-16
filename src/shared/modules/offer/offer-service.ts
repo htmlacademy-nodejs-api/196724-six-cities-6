@@ -1,19 +1,15 @@
 import mongoose from 'mongoose';
 import { DocumentType, types } from '@typegoose/typegoose';
 import { inject, injectable } from 'inversify';
-import { Collections, Components, SortType } from '../../types/index.js';
+import { Components, SortType } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { IOfferService } from './offer-service.interface.js';
 import { OfferEntity } from './offer.entity.js';
 import { CreateOfferDto, UpdateOfferDto } from './dtos/index.js';
 import { MAX_RETRIEVE_OFFERS, MAX_RETRIEVE_PREMIUM_OFFERS } from './offer-service.constants.js';
-import {
-  addedOfferExtraFields,
-  commentsLookupPipeline,
-  userFavouritesLookupPipeline
-} from './offer-service.pipelines.js';
-import {CommentEntity} from '../comment/index.js';
-import {UserEntity} from '../user/index.js';
+import { addedOfferExtraFields, lookupPipelines } from './offer-service.pipelines.js';
+import { CommentEntity } from '../comment/index.js';
+import { UserEntity } from '../user/index.js';
 
 
 @injectable()
@@ -26,8 +22,7 @@ export class OfferService implements IOfferService {
   ) {}
 
   public async create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>> {
-    const result = await (await this.offerModel.create(dto))
-      .populate(['userId']);
+    const result = await this.offerModel.create(dto);
     this.logger.info(`New offer created: ${result.name}`);
     return result;
   }
@@ -49,9 +44,19 @@ export class OfferService implements IOfferService {
 
   public async fetch(limit?: number): Promise<DocumentType<OfferEntity>[]> {
     return await this.offerModel.aggregate<DocumentType<OfferEntity>>([
-      commentsLookupPipeline,
+      ...lookupPipelines,
       addedOfferExtraFields,
-      { $unset: Collections.comments },
+      { $unset: [
+        'comments',
+        'favorites',
+        'description',
+        'location',
+        'userId',
+        'urls',
+        'bedrooms',
+        'guests',
+        'facilities'
+      ] },
       { $limit: limit ?? MAX_RETRIEVE_OFFERS },
       { $sort: { postDate: SortType.Down }}
     ]).exec();
@@ -61,12 +66,10 @@ export class OfferService implements IOfferService {
     const result: DocumentType<OfferEntity>[] = await this.offerModel.aggregate<DocumentType<OfferEntity>>(
       [
         { $match: { _id: new mongoose.Types.ObjectId(id) } },
-        commentsLookupPipeline,
-        userFavouritesLookupPipeline,
+        ...lookupPipelines,
         addedOfferExtraFields,
-        { $addFields: { isFavourite: { $toBool: { $size: '$favourites'} }}},
-        { $unset: Collections.comments },
-        { $unset: Collections.users },
+        { $unset: ['comments', 'favorites'] },
+        { $sort: { postDate: SortType.Down }},
         { $limit: 1 }
       ]
     ).exec();
@@ -76,23 +79,23 @@ export class OfferService implements IOfferService {
   public fetchPremiumByCity(city: string): Promise<DocumentType<OfferEntity>[]> {
     return this.offerModel.aggregate<DocumentType<OfferEntity>>([
       { $match: { city, isPremium: true } },
-      commentsLookupPipeline,
+      ...lookupPipelines,
       addedOfferExtraFields,
-      { $unset: Collections.comments },
+      { $unset: ['comments', 'favorites'] },
+      { $sort: { postDate: SortType.Down }},
       { $limit: MAX_RETRIEVE_PREMIUM_OFFERS },
-      { $sort: { postDate: SortType.Down }}
     ]).exec();
   }
 
+
   public fetchFavourites(): Promise<DocumentType<OfferEntity>[]> {
     return this.offerModel.aggregate<DocumentType<OfferEntity>>([
-      commentsLookupPipeline,
-      userFavouritesLookupPipeline,
+      ...lookupPipelines,
       addedOfferExtraFields,
       { $addFields: { isFavourite: { $toBool: { $size: '$favourites'} }}},
       { $match: { isFavourite: true }},
-      { $unset: Collections.comments },
-      { $unset: Collections.users },
+      { $unset: ['comments', 'favorites'] },
+      { $sort: { postDate: SortType.Down }},
     ]).exec();
   }
 }
