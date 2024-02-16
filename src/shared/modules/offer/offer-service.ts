@@ -98,4 +98,8 @@ export class OfferService implements IOfferService {
       { $sort: { postDate: SortType.Down }},
     ]).exec();
   }
+
+  public async exists(id: string): Promise<boolean> {
+    return !!(await this.offerModel.exists({_id: new mongoose.Types.ObjectId(id)}));
+  }
 }

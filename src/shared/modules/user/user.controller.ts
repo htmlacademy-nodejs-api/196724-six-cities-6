@@ -87,9 +87,9 @@ export class UserController extends Controller{
 
   public async addFavouriteOffer(req: AddUserFavouriteOfferRequest, res: Response) {
     const { body} = req;
-    const requiredOffer = await this.offerService.findById(body.offerId);
+    const isOfferExist = await this.offerService.exists(body.offerId);
 
-    if (requiredOffer) {
+    if (isOfferExist) {
       const result = await this.userService.addFavouriteOffer(req.params.id, body.offerId);
       this.success(res, fillDto(UserRdo, result));
     } else {

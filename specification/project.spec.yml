@@ -359,7 +359,7 @@ paths:
                   $ref: '#/components/schemas/Comment'
         "404":
           description: Comments not found.
-  /comments/offers:
+  /comments/offer/create:
     post:
       tags:
         - COMMENTS

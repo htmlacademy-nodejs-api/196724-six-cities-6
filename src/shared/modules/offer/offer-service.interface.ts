@@ -10,4 +10,5 @@ export interface IOfferService {
   fetchPremiumByCity(city: string): Promise<DocumentType<OfferEntity>[]>;
   fetchFavourites(): Promise<DocumentType<OfferEntity>[]>;
   findById(id: string): Promise<DocumentType<OfferEntity> | null>;
+  exists(id: string): Promise<boolean>;
 }

@@ -4,6 +4,9 @@ import { OfferLiteRdo } from './offer.lite.rdo.js';
 
 export class OfferRdo extends OfferLiteRdo {
   @Expose()
+  public userId: string;
+
+  @Expose()
   public description: string;
 
   @Expose()

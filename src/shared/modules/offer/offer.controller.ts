@@ -24,7 +24,7 @@ export class OfferController extends Controller {
     super(logger);
     this.logger.info('Register routes for OfferController ...');
 
-    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.getAll });
+    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.fetch });
     this.addRoute({ path: '/premium', method: HttpMethod.Get, handler: this.getPremiumByCity });
     this.addRoute({ path: '/favourites', method: HttpMethod.Get, handler: this.getFavourites });
     this.addRoute({ path: '/delete/:id', method: HttpMethod.Delete, handler: this.delete });
@@ -33,7 +33,7 @@ export class OfferController extends Controller {
     this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.getById });
   }
 
-  public async getAll(req: GetOffersRequestType, res: Response) {
+  public async fetch(req: GetOffersRequestType, res: Response) {
     const { query: { limit: _limit}} = req;
 
     const isValidLimit: boolean = _limit ? isNumber(_limit) : true;
@@ -110,7 +110,7 @@ export class OfferController extends Controller {
 
   public async create(req: CreateOffersRequestType, res: Response) {
     const { body} = req;
-
+    // @TODO check for a user?
     const result = await this.offerService.create(body);
     return this.created(res, fillDto(OfferRdo, result));
   }

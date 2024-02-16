@@ -1,7 +1,6 @@
 import { Collections, Location, PropertyType } from '../../types/index.js';
-import { getModelForClass, prop, modelOptions, Ref } from '@typegoose/typegoose';
+import { getModelForClass, prop, modelOptions } from '@typegoose/typegoose';
 import { BaseDocument } from '../base-document.js';
-import { UserEntity } from '../user/index.js';
 
 @modelOptions({
   schemaOptions: {
@@ -14,11 +13,8 @@ export class OfferEntity extends BaseDocument {
     super();
   }
 
-  @prop({
-    ref: UserEntity,
-    required: true,
-  })
-  public userId: Ref<UserEntity>;
+  @prop({ type: String, required: true })
+  public userId: string;
 
   @prop({ required: true })
   public name: string;

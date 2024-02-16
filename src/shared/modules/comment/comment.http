@@ -1,0 +1,15 @@
+### Getting all offer comments
+GET http://localhost:4000/comments/offers/65caa630ae538f90a64b3c9a
+Accept: application/json
+
+### Adding an user offer comment
+POST http://localhost:4000/comments/offers/create
+Content-Type: application/json
+
+{
+  "offerId": "65caa630ae538f90a64b3c9a",
+  "userId": "65c0bf5135a2c753f9298e63",
+  "text": "New comment",
+  "rating": 2,
+  "publishDate": "2024-02-16"
+}
