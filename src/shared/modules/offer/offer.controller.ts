@@ -14,9 +14,13 @@ import { HttpError } from '../../libs/exeption-filter/index.js';
 import { StatusCodes } from 'http-status-codes';
 import { GetOfferRequestType } from './types/get-offer-request.type.js';
 import { GetPremiumOffersRequest } from './types/get-premium-offers-request.type.js';
+import { ValidateDtoMiddleware, ValidateObjectIdMiddleware } from '../../libs/middleware/index.js';
+import { CreateOfferDto, UpdateOfferDto } from './dtos/index.js';
+import { createOfferValidator, updateOfferValidator } from './validators/index.js';
 
 @injectable()
 export class OfferController extends Controller {
+  private readonly validateObjectIdMiddleware: ValidateObjectIdMiddleware = new ValidateObjectIdMiddleware(['id']);
   constructor(
     @inject(Components.Logger) protected readonly logger: ILogger,
     @inject(Components.OfferService) private readonly offerService: IOfferService,
@@ -27,10 +31,33 @@ export class OfferController extends Controller {
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.fetch });
     this.addRoute({ path: '/premium', method: HttpMethod.Get, handler: this.getPremiumByCity });
     this.addRoute({ path: '/favourites', method: HttpMethod.Get, handler: this.getFavourites });
-    this.addRoute({ path: '/delete/:id', method: HttpMethod.Delete, handler: this.delete });
-    this.addRoute({ path: '/create', method: HttpMethod.Post, handler: this.create });
-    this.addRoute({ path: '/patch/:id', method: HttpMethod.Patch, handler: this.patch });
-    this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.getById });
+    this.addRoute({
+      path: '/delete/:id',
+      method: HttpMethod.Delete,
+      handler: this.delete ,
+      middleware: [this.validateObjectIdMiddleware]
+    });
+
+    this.addRoute({
+      path: '/create',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middleware: [new ValidateDtoMiddleware(CreateOfferDto, createOfferValidator)]
+    });
+
+    this.addRoute({
+      path: '/patch/:id',
+      method: HttpMethod.Patch,
+      handler: this.patch,
+      middleware: [this.validateObjectIdMiddleware, new ValidateDtoMiddleware(UpdateOfferDto, updateOfferValidator)]
+    });
+
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Get,
+      handler: this.getById,
+      middleware: [this.validateObjectIdMiddleware]
+    });
   }
 
   public async fetch(req: GetOffersRequestType, res: Response) {

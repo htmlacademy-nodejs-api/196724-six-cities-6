@@ -11,9 +11,14 @@ import { StatusCodes } from 'http-status-codes';
 import { IOfferService } from '../offer/index.js';
 import { ICommentService } from './comment-service.interface.js';
 import { CreateCommentRequest } from './types/create-comment-request.type.js';
+import { ValidateDtoMiddleware, ValidateObjectIdMiddleware } from '../../libs/middleware/index.js';
+import { CreateCommentDto } from './dtos/index.js';
+import { createCommentValidator } from './validators/index.js';
 
 @injectable()
-export class CommentController extends Controller{
+export class CommentController extends Controller {
+  private readonly validateObjectIdMiddleware: ValidateObjectIdMiddleware = new ValidateObjectIdMiddleware(['id']);
+
   constructor(
     @inject(Components.Logger) protected readonly logger: ILogger,
     @inject(Components.CommentService) private readonly commentService: ICommentService,
@@ -22,8 +27,19 @@ export class CommentController extends Controller{
     super(logger);
     this.logger.info('Register routes for CommentController ...');
 
-    this.addRoute({ path: '/offers/create', method: HttpMethod.Post, handler: this.create });
-    this.addRoute({ path: '/offers/:id', method: HttpMethod.Get, handler: this.fetchByOfferId });
+    this.addRoute({
+      path: '/offers/create',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middleware: [new ValidateDtoMiddleware(CreateCommentDto, createCommentValidator)]
+    });
+
+    this.addRoute({
+      path: '/offers/:id',
+      method: HttpMethod.Get,
+      handler: this.fetchByOfferId ,
+      middleware: [this.validateObjectIdMiddleware]
+    });
   }
 
   public async create(req: CreateCommentRequest, res: Response) {
