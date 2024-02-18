@@ -14,19 +14,27 @@ import { HttpError } from '../../libs/exeption-filter/index.js';
 import { StatusCodes } from 'http-status-codes';
 import { GetOfferRequestType } from './types/get-offer-request.type.js';
 import { GetPremiumOffersRequest } from './types/get-premium-offers-request.type.js';
-import { ValidateDtoMiddleware, ValidateObjectIdMiddleware } from '../../libs/middleware/index.js';
+import {
+  DocumentExistsMiddleware, IMiddleware,
+  ValidateDtoMiddleware,
+  ValidateObjectIdMiddleware
+} from '../../libs/middleware/index.js';
 import { CreateOfferDto, UpdateOfferDto } from './dtos/index.js';
 import { createOfferValidator, updateOfferValidator } from './validators/index.js';
 
 @injectable()
 export class OfferController extends Controller {
-  private readonly validateObjectIdMiddleware: ValidateObjectIdMiddleware = new ValidateObjectIdMiddleware(['id']);
+  private readonly validateObjectIdMiddleware: IMiddleware;
+  private readonly documentExistsMiddleware: IMiddleware;
   constructor(
     @inject(Components.Logger) protected readonly logger: ILogger,
     @inject(Components.OfferService) private readonly offerService: IOfferService,
   ) {
     super(logger);
     this.logger.info('Register routes for OfferController ...');
+
+    this.validateObjectIdMiddleware = new ValidateObjectIdMiddleware(['id']);
+    this.documentExistsMiddleware = new DocumentExistsMiddleware(this.offerService, 'Offer', 'id');
 
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.fetch });
     this.addRoute({ path: '/premium', method: HttpMethod.Get, handler: this.getPremiumByCity });
@@ -35,7 +43,10 @@ export class OfferController extends Controller {
       path: '/delete/:id',
       method: HttpMethod.Delete,
       handler: this.delete ,
-      middleware: [this.validateObjectIdMiddleware]
+      middleware: [
+        this.validateObjectIdMiddleware,
+        this.documentExistsMiddleware
+      ]
     });
 
     this.addRoute({
@@ -49,7 +60,11 @@ export class OfferController extends Controller {
       path: '/patch/:id',
       method: HttpMethod.Patch,
       handler: this.patch,
-      middleware: [this.validateObjectIdMiddleware, new ValidateDtoMiddleware(UpdateOfferDto, updateOfferValidator)]
+      middleware: [
+        this.validateObjectIdMiddleware,
+        new ValidateDtoMiddleware(UpdateOfferDto, updateOfferValidator),
+        this.documentExistsMiddleware
+      ]
     });
 
     this.addRoute({
@@ -99,7 +114,7 @@ export class OfferController extends Controller {
     const { query: { city}} = req;
 
     if(typeof city === 'string') {
-      const offers = await this.offerService.fetchPremiumByCity(city);
+      const offers = await this.offerService.fetchPremiumByCity(city.trim());
       if (offers.length) {
         return this.success(res, fillDto(OfferLiteRdo, offers));
       }

@@ -6,6 +6,7 @@ import { ICommentService } from './comment-service.interface.js';
 import { CreateCommentDto } from './dtos/index.js';
 import { CommentEntity } from './comment.entity.js';
 import { MAX_RETRIEVE_COMMENTS } from './comment-service.constants.js';
+import mongoose from 'mongoose';
 
 @injectable()
 export class CommentService implements ICommentService {
@@ -25,5 +26,9 @@ export class CommentService implements ICommentService {
       { offerId: id },
       null,
       { limit: MAX_RETRIEVE_COMMENTS, sort: { publishDate: SortType.Down }, _id: true });
+  }
+
+  public async exists(id: string): Promise<boolean> {
+    return !!(await this.commentModel.exists({_id: new mongoose.Types.ObjectId(id)}));
   }
 }

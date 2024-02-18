@@ -11,7 +11,10 @@ import { StatusCodes } from 'http-status-codes';
 import { IOfferService } from '../offer/index.js';
 import { ICommentService } from './comment-service.interface.js';
 import { CreateCommentRequest } from './types/create-comment-request.type.js';
-import { ValidateDtoMiddleware, ValidateObjectIdMiddleware } from '../../libs/middleware/index.js';
+import {
+  ValidateDtoMiddleware,
+  ValidateObjectIdMiddleware
+} from '../../libs/middleware/index.js';
 import { CreateCommentDto } from './dtos/index.js';
 import { createCommentValidator } from './validators/index.js';
 

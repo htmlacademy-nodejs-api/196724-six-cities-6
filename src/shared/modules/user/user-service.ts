@@ -7,6 +7,7 @@ import { ILogger } from '../../libs/logger/index.js';
 import { LoginUserDto, CreateUserDto } from './dtos/index.js';
 import { ApplicationSchema, IConfig } from '../../libs/config/index.js';
 import { getGeneratedSHA256 } from '../../utils/index.js';
+import mongoose from 'mongoose';
 
 @injectable()
 export class UserService implements IUserService {
@@ -74,5 +75,9 @@ export class UserService implements IUserService {
 
   public removeFavouriteOffer(id: string, offerId: string): Promise<DocumentType<UserEntity> | null> {
     return this.userModel.findByIdAndUpdate(id, { $pull: { favourites: offerId } }, { new: true });
+  }
+
+  public async exists(id: string): Promise<boolean> {
+    return !!(await this.userModel.exists({_id: new mongoose.Types.ObjectId(id)}));
   }
 }
