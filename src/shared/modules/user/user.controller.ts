@@ -1,21 +1,22 @@
-import { Controller, HttpMethod } from '../../libs/controller/index.js';
-import { inject, injectable } from 'inversify';
-import {Components, Storages} from '../../types/index.js';
-import { ILogger } from '../../libs/logger/index.js';
-import { IUserService } from './user-service.interface.js';
-import { Response} from 'express';
-import { fillDto } from '../../utils/index.js';
-import { UserRdo } from './rdos/index.js';
+import {Controller, HttpMethod} from '../../libs/controller/index.js';
+import {inject, injectable} from 'inversify';
+import {Components, Storage} from '../../types/index.js';
+import {ILogger} from '../../libs/logger/index.js';
+import {IUserService} from './user-service.interface.js';
+import {Response} from 'express';
+import {fillDto, getStorageUrl} from '../../utils/index.js';
+import {UserRdo} from './rdos/index.js';
 import {
   AddUserFavouriteOfferRequest,
   CreateUserRequest,
   GetUserRequest,
   LoginUserRequest,
-  RemoveUserFavouriteOfferRequest, UploadUserAvatarRequest
+  RemoveUserFavouriteOfferRequest,
+  UploadUserAvatarRequest
 } from './types/index.js';
-import { HttpError } from '../../libs/exeption-filter/index.js';
-import { StatusCodes } from 'http-status-codes';
-import { IOfferService } from '../offer/index.js';
+import {HttpError} from '../../libs/exeption-filter/index.js';
+import {StatusCodes} from 'http-status-codes';
+import {IOfferService} from '../offer/index.js';
 import {
   DocumentExistsMiddleware,
   IMiddleware,
@@ -23,10 +24,9 @@ import {
   ValidateDtoMiddleware,
   ValidateObjectIdMiddleware
 } from '../../libs/middleware/index.js';
-import { CreateUserDto, LoginUserDto } from './dtos/index.js';
-import { userAddFavouriteOfferValidator, userCreateValidator, userLoginValidator } from './validators/index.js';
-import { AddUserFavouriteOfferDto } from './dtos/index.js';
-import { ApplicationSchema, IConfig } from '../../libs/config/index.js';
+import {AddUserFavouriteOfferDto, CreateUserDto, LoginUserDto} from './dtos/index.js';
+import {userAddFavouriteOfferValidator, userCreateValidator, userLoginValidator} from './validators/index.js';
+import {ApplicationSchema, IConfig} from '../../libs/config/index.js';
 
 @injectable()
 export class UserController extends Controller {
@@ -102,8 +102,7 @@ export class UserController extends Controller {
         'UserController'
       );
     }
-    const avatarUrl = `http://localhost:${this.config.get('PORT')}${Storages.static}/default_avatar.png`;
-    const result = await this.userService.create({...body, avatarUrl });
+    const result = await this.userService.create(body);
     this.created(res, fillDto(UserRdo, result));
   }
 
@@ -167,7 +166,9 @@ export class UserController extends Controller {
     const { params} = req;
 
     if (params.id) {
-      const avatarUrl = `http://localhost:${this.config.get('PORT')}${Storages.upload}/${req.file?.filename}`;
+      const host = this.config.get('HOST');
+      const port = this.config.get('PORT');
+      const avatarUrl: string = getStorageUrl({port, host, storage: Storage.upload, fileName: req.file?.filename});
       const result = await this.userService.update(params.id, { avatarUrl });
       return this.success(res, fillDto(UserRdo, result));
     }

@@ -1,14 +1,15 @@
 import { DocumentType, types } from '@typegoose/typegoose';
 import { UserEntity } from './user.entity.js';
-import { IUserService } from './user-service.interface.js';
+import { IUserService} from './user-service.interface.js';
 import { inject, injectable } from 'inversify';
-import { Components } from '../../types/index.js';
-import { ILogger } from '../../libs/logger/index.js';
-import {LoginUserDto, CreateUserDto, UpdateUserDto} from './dtos/index.js';
+import { Components, Storage } from '../../types/index.js';
+import { ILogger} from '../../libs/logger/index.js';
+import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dtos/index.js';
 import { ApplicationSchema, IConfig } from '../../libs/config/index.js';
-import { getGeneratedSHA256 } from '../../utils/index.js';
+import { getGeneratedSHA256, getStorageUrl } from '../../utils/index.js';
 import mongoose from 'mongoose';
 
+const DEFAULT_AVATAR_FILE_NAME: string = 'default_avatar.png';
 @injectable()
 export class UserService implements IUserService {
   constructor(
@@ -21,12 +22,27 @@ export class UserService implements IUserService {
     return this.config && this.config.get('SALT');
   }
 
+  get port() {
+    return this.config && this.config.get('PORT');
+  }
+
+  get host() {
+    return this.config && this.config.get('HOST');
+  }
+
   public async create(dto: CreateUserDto): Promise<DocumentType<UserEntity>> {
     const user = new UserEntity(dto);
 
-    if (this.salt) {
+    if (this.salt && this.host && this.port) {
       user.setPassword(this.salt);
-      const result = await this.userModel.create(user);
+      const avatarUrl:string = getStorageUrl({
+        port: this.port,
+        host: this.host,
+        storage: Storage.static,
+        fileName: DEFAULT_AVATAR_FILE_NAME
+      });
+
+      const result = await this.userModel.create({...user, avatarUrl});
       this.logger.info(`New user created: ${user.email}`);
       return result;
     }

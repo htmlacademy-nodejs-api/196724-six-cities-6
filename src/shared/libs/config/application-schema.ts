@@ -11,6 +11,12 @@ export const configApplicationSchema = convict<ApplicationSchema>({
     env: 'PORT',
     default: null
   },
+  HOST: {
+    doc: 'Local host name.',
+    format: String,
+    env: 'HOST',
+    default: null
+  },
   SALT: {
     doc: 'Password hush.',
     format: String,

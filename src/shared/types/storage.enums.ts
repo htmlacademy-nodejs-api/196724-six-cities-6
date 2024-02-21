@@ -1,4 +1,4 @@
-export enum Storages {
+export enum Storage {
   upload = '/upload',
   static = '/static',
 }

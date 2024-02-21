@@ -1,5 +1,6 @@
 export type ApplicationSchema = {
   PORT: number;
+  HOST: string;
   SALT: string;
   DB_HOST: string;
   DB_PORT: string;
