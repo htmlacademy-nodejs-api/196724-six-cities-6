@@ -53,4 +53,10 @@ export const configApplicationSchema = convict<ApplicationSchema>({
     env: 'UPLOAD_DIRECTORY',
     default: null
   },
+  STATIC_DIRECTORY: {
+    doc: 'Directory for static files',
+    format: String,
+    env: 'STATIC_DIRECTORY',
+    default: null
+  },
 });

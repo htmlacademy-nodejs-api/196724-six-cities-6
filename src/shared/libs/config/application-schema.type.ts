@@ -7,4 +7,5 @@ export type ApplicationSchema = {
   DB_PASSWORD: string;
   DB_NAME: string;
   UPLOAD_DIRECTORY: string;
+  STATIC_DIRECTORY: string;
 }

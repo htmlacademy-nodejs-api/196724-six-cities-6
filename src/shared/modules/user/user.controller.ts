@@ -102,8 +102,8 @@ export class UserController extends Controller {
         'UserController'
       );
     }
-
-    const result = await this.userService.create(body);
+    const avatarUrl = `http://localhost:${this.config.get('PORT')}/static/default_avatar.png`;
+    const result = await this.userService.create({...body, avatarUrl });
     this.created(res, fillDto(UserRdo, result));
   }
 
@@ -167,7 +167,8 @@ export class UserController extends Controller {
     const { params} = req;
 
     if (params.id) {
-      const result = await this.userService.update(params.id, { avatarUrl: req.file?.path });
+      const avatarUrl = `http://localhost:${this.config.get('PORT')}/upload/${req.file?.filename}`;
+      const result = await this.userService.update(params.id, { avatarUrl });
       return this.success(res, fillDto(UserRdo, result));
     }
 
