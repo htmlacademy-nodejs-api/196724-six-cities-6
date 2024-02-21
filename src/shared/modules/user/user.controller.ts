@@ -16,9 +16,15 @@ import {
 import { HttpError } from '../../libs/exeption-filter/index.js';
 import { StatusCodes } from 'http-status-codes';
 import { IOfferService } from '../offer/index.js';
+import { ValidateDtoMiddleware, ValidateObjectIdMiddleware } from '../../libs/middleware/index.js';
+import { CreateUserDto, LoginUserDto} from './dtos/index.js';
+import {userAddFavouriteOfferValidator, userCreateValidator, userLoginValidator} from './validators/index.js';
+import {AddUserFavouriteOfferDto} from './dtos/add-user-favourite-offer-dto.js';
 
 @injectable()
-export class UserController extends Controller{
+export class UserController extends Controller {
+  private readonly validateObjectIdMiddleware: ValidateObjectIdMiddleware = new ValidateObjectIdMiddleware(['id', 'offerId']);
+
   constructor(
     @inject(Components.Logger) protected readonly logger: ILogger,
     @inject(Components.UserService) private readonly userService: IUserService,
@@ -27,11 +33,41 @@ export class UserController extends Controller{
     super(logger);
     this.logger.info('Register routes for UserController ...');
 
-    this.addRoute({ path: '/create', method: HttpMethod.Post, handler: this.create });
-    this.addRoute({ path: '/login', method: HttpMethod.Post, handler: this.login });
-    this.addRoute({ path: '/:id/offers/favourite/add', method: HttpMethod.Post, handler: this.addFavouriteOffer });
-    this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.getById });
-    this.addRoute({ path: '/:id/offers/favourite/:offerId/remove', method: HttpMethod.Delete, handler: this.removeFavouriteOffer });
+    this.addRoute({
+      path: '/create',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middleware: [new ValidateDtoMiddleware(CreateUserDto, userCreateValidator)]
+    });
+
+    this.addRoute({
+      path: '/login',
+      method: HttpMethod.Post,
+      handler: this.login,
+      middleware: [new ValidateDtoMiddleware(LoginUserDto, userLoginValidator)]
+
+    });
+
+    this.addRoute({
+      path: '/:id/offers/favourite/add',
+      method: HttpMethod.Post,
+      handler: this.addFavouriteOffer,
+      middleware: [this.validateObjectIdMiddleware, new ValidateDtoMiddleware(AddUserFavouriteOfferDto, userAddFavouriteOfferValidator)]
+    });
+
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Get,
+      handler: this.getById,
+      middleware: [this.validateObjectIdMiddleware]
+    });
+
+    this.addRoute({
+      path: '/:id/offers/favourite/:offerId/remove',
+      method: HttpMethod.Delete,
+      handler: this.removeFavouriteOffer,
+      middleware: [this.validateObjectIdMiddleware]
+    });
   }
 
   public async create(req: CreateUserRequest, res: Response) {
@@ -87,9 +123,9 @@ export class UserController extends Controller{
 
   public async addFavouriteOffer(req: AddUserFavouriteOfferRequest, res: Response) {
     const { body} = req;
-    const requiredOffer = await this.offerService.findById(body.offerId);
+    const isOfferExist = await this.offerService.exists(body.offerId);
 
-    if (requiredOffer) {
+    if (isOfferExist) {
       const result = await this.userService.addFavouriteOffer(req.params.id, body.offerId);
       this.success(res, fillDto(UserRdo, result));
     } else {

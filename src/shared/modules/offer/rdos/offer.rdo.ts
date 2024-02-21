@@ -1,8 +1,12 @@
-import { Expose } from 'class-transformer';
-import { Location } from '../../../types/index.js';
+import { Expose, Type } from 'class-transformer';
+import { Location, UserType } from '../../../types/index.js';
 import { OfferLiteRdo } from './offer.lite.rdo.js';
+import { UserRdo } from '../../user/index.js';
 
 export class OfferRdo extends OfferLiteRdo {
+  @Expose()
+  public userId: string;
+
   @Expose()
   public description: string;
 
@@ -20,4 +24,8 @@ export class OfferRdo extends OfferLiteRdo {
 
   @Expose()
   public location: Location;
+
+  @Expose({ name: 'userId'})
+  @Type(() => UserRdo)
+  public author: UserType;
 }

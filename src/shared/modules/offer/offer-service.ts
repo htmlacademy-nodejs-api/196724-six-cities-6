@@ -63,7 +63,7 @@ export class OfferService implements IOfferService {
   }
 
   public async findById(id: string): Promise<DocumentType<OfferEntity>> {
-    const result: DocumentType<OfferEntity>[] = await this.offerModel.aggregate<DocumentType<OfferEntity>>(
+    const [offer]: DocumentType<OfferEntity>[] = await this.offerModel.aggregate<DocumentType<OfferEntity>>(
       [
         { $match: { _id: new mongoose.Types.ObjectId(id) } },
         ...lookupPipelines,
@@ -73,7 +73,7 @@ export class OfferService implements IOfferService {
         { $limit: 1 }
       ]
     ).exec();
-    return result[0];
+    return this.offerModel.populate(offer, {path: 'userId'});
   }
 
   public fetchPremiumByCity(city: string): Promise<DocumentType<OfferEntity>[]> {
@@ -97,5 +97,9 @@ export class OfferService implements IOfferService {
       { $unset: ['comments', 'favorites'] },
       { $sort: { postDate: SortType.Down }},
     ]).exec();
+  }
+
+  public async exists(id: string): Promise<boolean> {
+    return !!(await this.offerModel.exists({_id: new mongoose.Types.ObjectId(id)}));
   }
 }

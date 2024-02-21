@@ -18,6 +18,7 @@ export class Application implements IApplication {
     @inject(Components.DatabaseClient) private readonly databaseClient: IDatabaseClient,
     @inject(Components.UserController) private readonly userController: IController,
     @inject(Components.OfferController) private readonly offerController: IController,
+    @inject(Components.CommentController) private readonly commentController: IController,
     @inject(Components.ExceptionFilter) private readonly exceptionFilter: IExceptionFilter,
   ) {
     this.server = express();
@@ -46,6 +47,7 @@ export class Application implements IApplication {
   private async initializeControllers() {
     this.server.use(ApplicationRoutes.users, this.userController.router);
     this.server.use(ApplicationRoutes.offers, this.offerController.router);
+    this.server.use(ApplicationRoutes.comments, this.commentController.router);
   }
 
   private async initializeExceptionFilters() {

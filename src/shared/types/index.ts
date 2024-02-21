@@ -10,3 +10,5 @@ export * from './user.type.js';
 export * from './comment.type.js';
 export * from './collections.enums.js';
 export * from './sort-type.enums.js';
+export * from './service.interface.js';
+export * from './document-exists.interface.js';

@@ -14,9 +14,18 @@ import { HttpError } from '../../libs/exeption-filter/index.js';
 import { StatusCodes } from 'http-status-codes';
 import { GetOfferRequestType } from './types/get-offer-request.type.js';
 import { GetPremiumOffersRequest } from './types/get-premium-offers-request.type.js';
+import {
+  DocumentExistsMiddleware, IMiddleware,
+  ValidateDtoMiddleware,
+  ValidateObjectIdMiddleware
+} from '../../libs/middleware/index.js';
+import { CreateOfferDto, UpdateOfferDto } from './dtos/index.js';
+import { createOfferValidator, updateOfferValidator } from './validators/index.js';
 
 @injectable()
 export class OfferController extends Controller {
+  private readonly validateObjectIdMiddleware: IMiddleware;
+  private readonly documentExistsMiddleware: IMiddleware;
   constructor(
     @inject(Components.Logger) protected readonly logger: ILogger,
     @inject(Components.OfferService) private readonly offerService: IOfferService,
@@ -24,16 +33,49 @@ export class OfferController extends Controller {
     super(logger);
     this.logger.info('Register routes for OfferController ...');
 
-    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.getAll });
+    this.validateObjectIdMiddleware = new ValidateObjectIdMiddleware(['id']);
+    this.documentExistsMiddleware = new DocumentExistsMiddleware(this.offerService, 'Offer', 'id');
+
+    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.fetch });
     this.addRoute({ path: '/premium', method: HttpMethod.Get, handler: this.getPremiumByCity });
     this.addRoute({ path: '/favourites', method: HttpMethod.Get, handler: this.getFavourites });
-    this.addRoute({ path: '/delete/:id', method: HttpMethod.Delete, handler: this.delete });
-    this.addRoute({ path: '/create', method: HttpMethod.Post, handler: this.create });
-    this.addRoute({ path: '/patch/:id', method: HttpMethod.Patch, handler: this.patch });
-    this.addRoute({ path: '/:id', method: HttpMethod.Get, handler: this.getById });
+    this.addRoute({
+      path: '/delete/:id',
+      method: HttpMethod.Delete,
+      handler: this.delete ,
+      middleware: [
+        this.validateObjectIdMiddleware,
+        this.documentExistsMiddleware
+      ]
+    });
+
+    this.addRoute({
+      path: '/create',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middleware: [new ValidateDtoMiddleware(CreateOfferDto, createOfferValidator)]
+    });
+
+    this.addRoute({
+      path: '/patch/:id',
+      method: HttpMethod.Patch,
+      handler: this.patch,
+      middleware: [
+        this.validateObjectIdMiddleware,
+        new ValidateDtoMiddleware(UpdateOfferDto, updateOfferValidator),
+        this.documentExistsMiddleware
+      ]
+    });
+
+    this.addRoute({
+      path: '/:id',
+      method: HttpMethod.Get,
+      handler: this.getById,
+      middleware: [this.validateObjectIdMiddleware]
+    });
   }
 
-  public async getAll(req: GetOffersRequestType, res: Response) {
+  public async fetch(req: GetOffersRequestType, res: Response) {
     const { query: { limit: _limit}} = req;
 
     const isValidLimit: boolean = _limit ? isNumber(_limit) : true;
@@ -72,7 +114,7 @@ export class OfferController extends Controller {
     const { query: { city}} = req;
 
     if(typeof city === 'string') {
-      const offers = await this.offerService.fetchPremiumByCity(city);
+      const offers = await this.offerService.fetchPremiumByCity(city.trim());
       if (offers.length) {
         return this.success(res, fillDto(OfferLiteRdo, offers));
       }
@@ -110,7 +152,7 @@ export class OfferController extends Controller {
 
   public async create(req: CreateOffersRequestType, res: Response) {
     const { body} = req;
-
+    // @TODO check for a user?
     const result = await this.offerService.create(body);
     return this.created(res, fillDto(OfferRdo, result));
   }
