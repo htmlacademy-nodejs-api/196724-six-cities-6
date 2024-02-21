@@ -1,6 +1,6 @@
 import { Controller, HttpMethod } from '../../libs/controller/index.js';
 import { inject, injectable } from 'inversify';
-import { Components } from '../../types/index.js';
+import {Components, Storages} from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { IUserService } from './user-service.interface.js';
 import { Response} from 'express';
@@ -102,7 +102,7 @@ export class UserController extends Controller {
         'UserController'
       );
     }
-    const avatarUrl = `http://localhost:${this.config.get('PORT')}/static/default_avatar.png`;
+    const avatarUrl = `http://localhost:${this.config.get('PORT')}${Storages.static}/default_avatar.png`;
     const result = await this.userService.create({...body, avatarUrl });
     this.created(res, fillDto(UserRdo, result));
   }
@@ -167,7 +167,7 @@ export class UserController extends Controller {
     const { params} = req;
 
     if (params.id) {
-      const avatarUrl = `http://localhost:${this.config.get('PORT')}/upload/${req.file?.filename}`;
+      const avatarUrl = `http://localhost:${this.config.get('PORT')}${Storages.upload}/${req.file?.filename}`;
       const result = await this.userService.update(params.id, { avatarUrl });
       return this.success(res, fillDto(UserRdo, result));
     }

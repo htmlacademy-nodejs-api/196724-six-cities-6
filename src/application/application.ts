@@ -6,7 +6,7 @@ import { IDatabaseClient } from '../shared/libs/database-client/index.js';
 import { getMongoUrl } from '../shared/utils/database.js';
 import express, {Express} from 'express';
 import { ApplicationRoutes, IController } from '../shared/libs/controller/index.js';
-import { Components } from '../shared/types/index.js';
+import {Components, Storages} from '../shared/types/index.js';
 import { IExceptionFilter } from '../shared/libs/exeption-filter/index.js';
 
 @injectable()
@@ -43,11 +43,11 @@ export class Application implements IApplication {
   private async initializeMiddleware() {
     this.server.use(express.json());
     this.server.use(
-      '/upload',
+      Storages.upload,
       express.static(this.config.get('UPLOAD_DIRECTORY'))
     );
     this.server.use(
-      '/static',
+      Storages.static,
       express.static(this.config.get('STATIC_DIRECTORY'))
     );
   }
