@@ -25,7 +25,7 @@ export class CommentService implements ICommentService {
     return this.commentModel.find(
       { offerId: id },
       null,
-      { limit: MAX_RETRIEVE_COMMENTS, sort: { publishDate: SortType.Down }, _id: true });
+      { limit: MAX_RETRIEVE_COMMENTS, sort: { publishDate: SortType.Down }, populate: 'userId' });
   }
 
   public async exists(id: string): Promise<boolean> {

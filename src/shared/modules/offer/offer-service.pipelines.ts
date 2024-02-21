@@ -5,7 +5,7 @@ export const lookupPipelines: PipelineStage[] = [
   {
     $lookup: {
       from: Collections.comments,
-      let: { offerId: { $toString: '$_id' } },
+      let: { offerId: '$_id'},
       pipeline: [
         { $match: { $expr: { $eq: ['$offerId', '$$offerId'] } } },
         { $project: { _id: 1, rating: 1 }}
