@@ -17,3 +17,5 @@ gen
 # Generated mocked data
 mocks/offers.tsv
 
+/upload/
+

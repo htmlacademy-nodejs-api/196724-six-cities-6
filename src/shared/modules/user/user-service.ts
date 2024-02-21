@@ -4,7 +4,7 @@ import { IUserService } from './user-service.interface.js';
 import { inject, injectable } from 'inversify';
 import { Components } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
-import { LoginUserDto, CreateUserDto } from './dtos/index.js';
+import {LoginUserDto, CreateUserDto, UpdateUserDto} from './dtos/index.js';
 import { ApplicationSchema, IConfig } from '../../libs/config/index.js';
 import { getGeneratedSHA256 } from '../../utils/index.js';
 import mongoose from 'mongoose';
@@ -34,7 +34,14 @@ export class UserService implements IUserService {
     throw Error('SALT has not been provided for password hashing.');
   }
 
-  public async findById(id: string): Promise<DocumentType<UserEntity> | null> {
+  public async update(id: string, dto: UpdateUserDto): Promise<DocumentType<UserEntity> | null> {
+    const result = await this.userModel.findByIdAndUpdate(id, dto, { new: true })
+      .exec();
+    this.logger.info(`User (${ dto.name }) details  updated.`);
+    return result;
+  }
+
+  public findById(id: string): Promise<DocumentType<UserEntity> | null> {
     const user = this.userModel.findById(id).exec();
     if (user) {
       return user;

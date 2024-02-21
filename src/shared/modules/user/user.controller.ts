@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { Components } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { IUserService } from './user-service.interface.js';
-import { Response } from 'express';
+import { Response} from 'express';
 import { fillDto } from '../../utils/index.js';
 import { UserRdo } from './rdos/index.js';
 import {
@@ -11,27 +11,37 @@ import {
   CreateUserRequest,
   GetUserRequest,
   LoginUserRequest,
-  RemoveUserFavouriteOfferRequest
+  RemoveUserFavouriteOfferRequest, UploadUserAvatarRequest
 } from './types/index.js';
 import { HttpError } from '../../libs/exeption-filter/index.js';
 import { StatusCodes } from 'http-status-codes';
 import { IOfferService } from '../offer/index.js';
-import { ValidateDtoMiddleware, ValidateObjectIdMiddleware } from '../../libs/middleware/index.js';
-import { CreateUserDto, LoginUserDto} from './dtos/index.js';
-import {userAddFavouriteOfferValidator, userCreateValidator, userLoginValidator} from './validators/index.js';
-import {AddUserFavouriteOfferDto} from './dtos/add-user-favourite-offer-dto.js';
+import {
+  DocumentExistsMiddleware,
+  IMiddleware,
+  UploadFileMiddleware,
+  ValidateDtoMiddleware,
+  ValidateObjectIdMiddleware
+} from '../../libs/middleware/index.js';
+import { CreateUserDto, LoginUserDto } from './dtos/index.js';
+import { userAddFavouriteOfferValidator, userCreateValidator, userLoginValidator } from './validators/index.js';
+import { AddUserFavouriteOfferDto } from './dtos/index.js';
+import { ApplicationSchema, IConfig } from '../../libs/config/index.js';
 
 @injectable()
 export class UserController extends Controller {
-  private readonly validateObjectIdMiddleware: ValidateObjectIdMiddleware = new ValidateObjectIdMiddleware(['id', 'offerId']);
+  private readonly validateObjectIdMiddleware: IMiddleware;
 
   constructor(
     @inject(Components.Logger) protected readonly logger: ILogger,
     @inject(Components.UserService) private readonly userService: IUserService,
     @inject(Components.OfferService) private readonly offerService: IOfferService,
+    @inject(Components.Config) private readonly config: IConfig<ApplicationSchema>,
   ) {
     super(logger);
     this.logger.info('Register routes for UserController ...');
+
+    this.validateObjectIdMiddleware = new ValidateObjectIdMiddleware(['id', 'offerId']);
 
     this.addRoute({
       path: '/create',
@@ -67,6 +77,17 @@ export class UserController extends Controller {
       method: HttpMethod.Delete,
       handler: this.removeFavouriteOffer,
       middleware: [this.validateObjectIdMiddleware]
+    });
+
+    this.addRoute({
+      path: '/:id/avatar',
+      method: HttpMethod.Post,
+      handler: this.uploadAvatar,
+      middleware: [
+        this.validateObjectIdMiddleware,
+        new DocumentExistsMiddleware(this.userService, 'User', 'id'),
+        new UploadFileMiddleware(this.config.get('UPLOAD_DIRECTORY'), 'avatar'),
+      ]
     });
   }
 
@@ -140,5 +161,20 @@ export class UserController extends Controller {
   public async removeFavouriteOffer(req: RemoveUserFavouriteOfferRequest, res: Response) {
     const result = await this.userService.removeFavouriteOffer(req.params.id, req.params.offerId);
     this.success(res, fillDto(UserRdo, result));
+  }
+
+  public async uploadAvatar(req: UploadUserAvatarRequest, res: Response): Promise<void> {
+    const { params} = req;
+
+    if (params.id) {
+      const result = await this.userService.update(params.id, { avatarUrl: req.file?.path });
+      return this.success(res, fillDto(UserRdo, result));
+    }
+
+    throw new HttpError(
+      StatusCodes.BAD_REQUEST,
+      `Not able to read user id: ${params.id}.`,
+      'UserController'
+    );
   }
 }

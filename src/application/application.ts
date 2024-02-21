@@ -42,6 +42,10 @@ export class Application implements IApplication {
 
   private async initializeMiddleware() {
     this.server.use(express.json());
+    this.server.use(
+      '/upload',
+      express.static(this.config.get('UPLOAD_DIRECTORY'))
+    );
   }
 
   private async initializeControllers() {
