@@ -12,6 +12,7 @@ import { IOfferService } from '../offer/index.js';
 import { ICommentService } from './comment-service.interface.js';
 import { CreateCommentRequest } from './types/create-comment-request.type.js';
 import {
+  PrivateRouteMiddleware,
   ValidateDtoMiddleware,
   ValidateObjectIdMiddleware
 } from '../../libs/middleware/index.js';
@@ -34,7 +35,10 @@ export class CommentController extends Controller {
       path: '/offers/create',
       method: HttpMethod.Post,
       handler: this.create,
-      middleware: [new ValidateDtoMiddleware(CreateCommentDto, createCommentValidator)]
+      middleware: [
+        new PrivateRouteMiddleware(),
+        new ValidateDtoMiddleware(CreateCommentDto, createCommentValidator)
+      ]
     });
 
     this.addRoute({
@@ -46,10 +50,11 @@ export class CommentController extends Controller {
   }
 
   public async create(req: CreateCommentRequest, res: Response) {
-    const { body} = req;
+    const { body, tokenPayload} = req;
+    const { id} = tokenPayload;
     const isOfferExist = await this.offerService.exists(body.offerId);
     if (isOfferExist) {
-      const result = await this.commentService.create(body);
+      const result = await this.commentService.create({...body, userId: id});
       return this.created(res, fillDto(CommentRdo, result));
     }
 

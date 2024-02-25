@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { AddUserFavouriteOfferDto } from '../dtos/add-user-favourite-offer-dto.js';
+import { AddUserFavouriteOfferDto } from '../dtos/index.js';
 import { USER_OBJECT_ID_HEX_MAX } from './user-constraints.constants.js';
 
 export const userAddFavouriteOfferValidator = Joi.object<AddUserFavouriteOfferDto>({

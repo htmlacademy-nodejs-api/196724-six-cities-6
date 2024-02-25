@@ -15,7 +15,7 @@ import { StatusCodes } from 'http-status-codes';
 import { GetOfferRequestType } from './types/get-offer-request.type.js';
 import { GetPremiumOffersRequest } from './types/get-premium-offers-request.type.js';
 import {
-  DocumentExistsMiddleware, IMiddleware,
+  DocumentExistsMiddleware, IMiddleware, PrivateRouteMiddleware,
   ValidateDtoMiddleware,
   ValidateObjectIdMiddleware
 } from '../../libs/middleware/index.js';
@@ -26,6 +26,7 @@ import { createOfferValidator, updateOfferValidator } from './validators/index.j
 export class OfferController extends Controller {
   private readonly validateObjectIdMiddleware: IMiddleware;
   private readonly documentExistsMiddleware: IMiddleware;
+  private readonly privateRouteMiddleware: IMiddleware;
   constructor(
     @inject(Components.Logger) protected readonly logger: ILogger,
     @inject(Components.OfferService) private readonly offerService: IOfferService,
@@ -33,17 +34,25 @@ export class OfferController extends Controller {
     super(logger);
     this.logger.info('Register routes for OfferController ...');
 
+    this.privateRouteMiddleware = new PrivateRouteMiddleware();
     this.validateObjectIdMiddleware = new ValidateObjectIdMiddleware(['id']);
     this.documentExistsMiddleware = new DocumentExistsMiddleware(this.offerService, 'Offer', 'id');
 
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.fetch });
     this.addRoute({ path: '/premium', method: HttpMethod.Get, handler: this.getPremiumByCity });
-    this.addRoute({ path: '/favourites', method: HttpMethod.Get, handler: this.getFavourites });
+    this.addRoute({
+      path: '/favourites',
+      method: HttpMethod.Get,
+      handler: this.getFavourites,
+      middleware: [ this.privateRouteMiddleware ]
+    });
+
     this.addRoute({
       path: '/delete/:id',
       method: HttpMethod.Delete,
       handler: this.delete ,
       middleware: [
+        this.privateRouteMiddleware,
         this.validateObjectIdMiddleware,
         this.documentExistsMiddleware
       ]
@@ -53,7 +62,10 @@ export class OfferController extends Controller {
       path: '/create',
       method: HttpMethod.Post,
       handler: this.create,
-      middleware: [new ValidateDtoMiddleware(CreateOfferDto, createOfferValidator)]
+      middleware: [
+        this.privateRouteMiddleware,
+        new ValidateDtoMiddleware(CreateOfferDto, createOfferValidator)
+      ]
     });
 
     this.addRoute({
@@ -61,6 +73,7 @@ export class OfferController extends Controller {
       method: HttpMethod.Patch,
       handler: this.patch,
       middleware: [
+        this.privateRouteMiddleware,
         this.validateObjectIdMiddleware,
         new ValidateDtoMiddleware(UpdateOfferDto, updateOfferValidator),
         this.documentExistsMiddleware
@@ -76,13 +89,13 @@ export class OfferController extends Controller {
   }
 
   public async fetch(req: GetOffersRequestType, res: Response) {
-    const { query: { limit: _limit}} = req;
+    const { query: { limit}, tokenPayload} = req;
 
-    const isValidLimit: boolean = _limit ? isNumber(_limit) : true;
+    const isValidLimit: boolean = limit ? isNumber(limit) : true;
 
     if (isValidLimit) {
-      const limit = _limit ? Number(_limit) : undefined;
-      const offers = await this.offerService.fetch(limit);
+      const parsedLimit: number | undefined = limit ? Number(limit) : undefined;
+      const offers = await this.offerService.fetch(tokenPayload?.id, parsedLimit);
       if (offers.length) {
         return this.success(res, fillDto(OfferLiteRdo, offers));
       }
@@ -91,7 +104,7 @@ export class OfferController extends Controller {
 
     throw new HttpError(
       StatusCodes.BAD_REQUEST,
-      `Limit ${_limit} is not a number.`,
+      `Limit ${limit} is not a number.`,
       'OfferController'
     );
   }
@@ -127,11 +140,13 @@ export class OfferController extends Controller {
     );
   }
 
-  public async getFavourites(_req: Request, res: Response) {
-    const offers = await this.offerService.fetchFavourites();
+  public async getFavourites(req: Request, res: Response) {
+    const { tokenPayload: { id} } = req;
+    const offers = await this.offerService.fetchFavourites(id);
     if (offers.length) {
       return this.success(res, fillDto(OfferLiteRdo, offers));
     }
+
     return this.noContent(res, fillDto(OfferLiteRdo, offers));
   }
 
@@ -151,15 +166,13 @@ export class OfferController extends Controller {
   }
 
   public async create(req: CreateOffersRequestType, res: Response) {
-    const { body} = req;
-    // @TODO check for a user?
-    const result = await this.offerService.create(body);
+    const { body, tokenPayload} = req;
+    const result = await this.offerService.create({ ...body, userId: tokenPayload.id });
     return this.created(res, fillDto(OfferRdo, result));
   }
 
   public async patch(req: PatchOffersRequestType, res: Response) {
     const { body, params} = req;
-
 
     if (params.id) {
       const result = await this.offerService.update(params.id, body);
