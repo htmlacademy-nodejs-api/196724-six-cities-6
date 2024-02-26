@@ -19,5 +19,4 @@ export const Components = {
   ExceptionFilter: Symbol.for('ExceptionFilter'),
   UserController: Symbol.for('UserController'),
   CommentController: Symbol.for('CommentController'),
-  AuthService: Symbol.for('AuthService'),
 } as const;

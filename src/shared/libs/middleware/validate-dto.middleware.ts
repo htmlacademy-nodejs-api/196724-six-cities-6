@@ -12,7 +12,7 @@ export class ValidateDtoMiddleware implements IMiddleware {
   public async execute({ body }: Request, res: Response, next: NextFunction): Promise<void> {
     const dtoInstance = plainToInstance(this.dto, body);
     try {
-      await this.validator.validateAsync(dtoInstance, { abortEarly: false, stripUnknown: true  });
+      await this.validator.validateAsync(dtoInstance, { abortEarly: false });
       return next();
 
     } catch (e: unknown) {

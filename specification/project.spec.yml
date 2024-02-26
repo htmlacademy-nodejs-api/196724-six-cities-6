@@ -83,12 +83,43 @@ paths:
           description: Unauthorized.
         "404":
           description: Not Found.
-  /users/offers/favourite/add:
+  /users/{id}:
+    get:
+      tags:
+        - USERS
+      summary: A user details.
+      description: A user details.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: User id.
+      responses:
+        "200":
+          description: A user details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "404":
+          description: A user with this id not found.
+        "401":
+          description: The user does’t have valid authentication credentials to get the requested resource.
+  /users/{id}/offers/favourite/add:
     post:
       tags:
         - USERS
       summary: Manage a user favourite offers list.
       description: Adding an offer from a user favourite list.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: User id.
       requestBody:
         description: Add user favourite offer.
         content:
@@ -105,13 +136,19 @@ paths:
                 $ref: '#/components/schemas/User'
         "404":
           description: Offer not found.
-  /users/offers/favourite/{offerId}/remove:
+  /users/{id}/offers/favourite/{offerId}/remove:
     delete:
       tags:
         - USERS
       summary: Manage a user favourite offers list.
       description: Deleting an offer from a user favourite list.
       parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: User id.
         - in: path
           name: offerId
           schema:
@@ -127,12 +164,19 @@ paths:
                 $ref: '#/components/schemas/User'
         "404":
           description: Offer not found.
-  /users/avatar/upload:
+  /users/{id}/avatar:
     post:
       tags:
         - USERS
       summary: A user avatar upload.
       description: A user avatar.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: User id.
       responses:
         "200":
           description: A user avatar uploaded.
@@ -425,6 +469,9 @@ components:
       allOf:
         - $ref: '#/components/schemas/UpdateOfferRequest'
         - type: object
+        - properties:
+            userId:
+              type: string
     UpdateOfferRequest:
       type: object
       properties:
@@ -530,6 +577,8 @@ components:
         publishDate:
           type: string
           example: 2020-07-10
+        userId:
+          type: string
     Comment:
       type: object
       allOf:

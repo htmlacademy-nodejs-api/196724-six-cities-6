@@ -37,6 +37,5 @@
   ],
   "ts-node": {
     "esm": true
-  },
-  "files": ["./express.d.ts"]
+  }
 }

@@ -17,7 +17,6 @@ export class CommentService implements ICommentService {
 
   public async create(dto: CreateCommentDto): Promise<DocumentType<CommentEntity>> {
     const result: DocumentType<CommentEntity> = await this.commentModel.create(dto);
-    await result.populate('userId');
     this.logger.info('New comment created!');
     return result;
   }
