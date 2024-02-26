@@ -46,5 +46,11 @@ export const configApplicationSchema = convict<ApplicationSchema>({
     format: String,
     env: 'DB_NAME',
     default: null
-  }
+  },
+  JWT_SECRET: {
+    doc: 'JWT secret',
+    format: String,
+    env: 'JWT_SECRET',
+    default: null
+  },
 });

@@ -22,14 +22,20 @@ Content-Type: application/json
   "password": "123qwe"
 }
 
+### Chekc user authorisation
+POST http://localhost:4000/users/check
+Authorization: Bearer
+
 ### Adding an user offer
-POST http://localhost:4000/users/65c0bf5135a2c753f9298e63/offers/favourite/add
+POST http://localhost:4000/users/offers/favourite/add
 Content-Type: application/json
+Authorization: Bearer
 
 {
   "offerId": "65caa630ae538f90a64b3c9a"
 }
 
 ### Removing an user offer
-DELETE http://localhost:4000/users/65c0bf5135a2c753f9298e63/offers/favourite/65caa630ae538f90a64b3c9a/remove
+DELETE http://localhost:4000/users/offers/favourite/65caa630ae538f90a64b3c9a/remove
 Content-Type: application/json
+Authorization: Bearer
