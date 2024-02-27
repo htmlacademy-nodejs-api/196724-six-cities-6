@@ -41,7 +41,7 @@ Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0g
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="avatar"; filename="amsterdam.jpg"
-Content-Type: image/png
+Content-Type: image/jpeg
 
 < /Users/il421/WebstormProjects/196724-six-cities-6/markup/img/amsterdam.jpg
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
