@@ -1,13 +1,18 @@
 import mongoose from 'mongoose';
 import { DocumentType, types } from '@typegoose/typegoose';
 import { inject, injectable } from 'inversify';
-import { Components, SortType } from '../../types/index.js';
+import { Collections, Components, SortType } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { IOfferService } from './offer-service.interface.js';
 import { OfferEntity } from './offer.entity.js';
 import { CreateOfferDto, UpdateOfferDto } from './dtos/index.js';
 import { MAX_RETRIEVE_OFFERS, MAX_RETRIEVE_PREMIUM_OFFERS } from './offer-service.constants.js';
-import { addedOfferExtraFields, lookupPipelines } from './offer-service.pipelines.js';
+import {
+  addCommentsCountAndRatingFields,
+  commentsLookup,
+  sortPipelineStage,
+  usersLookup
+} from './offer-service.pipelines.js';
 import { CommentEntity } from '../comment/index.js';
 import { UserEntity } from '../user/index.js';
 
@@ -42,23 +47,28 @@ export class OfferService implements IOfferService {
     return result;
   }
 
-  public async fetch(limit?: number): Promise<DocumentType<OfferEntity>[]> {
+  public async fetch(userId?: string, limit?: number): Promise<DocumentType<OfferEntity>[]> {
     return await this.offerModel.aggregate<DocumentType<OfferEntity>>([
-      ...lookupPipelines,
-      addedOfferExtraFields,
-      { $unset: [
-        'comments',
-        'favorites',
-        'description',
-        'location',
-        'userId',
-        'urls',
-        'bedrooms',
-        'guests',
-        'facilities'
-      ] },
+      commentsLookup,
+      {
+        $lookup: {
+          from: Collections.users,
+          let: { offerId: '$_id' },
+          pipeline: [
+            { $match: { $expr: { $eq: [{ $convert: { input: '$_id', to: 'string' } }, userId] } } },
+            { $match: { $expr: { $in: [{ $convert: { input: '$$offerId', to: 'string' } }, '$favourites'] } } },
+          ],
+          as: 'favourites'
+        }
+      },
+      {
+        $addFields: {
+          ...addCommentsCountAndRatingFields,
+          isFavourite: userId ? { $toBool: { $size: '$favourites'} } : false
+        }
+      },
       { $limit: limit ?? MAX_RETRIEVE_OFFERS },
-      { $sort: { postDate: SortType.Down }}
+      sortPipelineStage
     ]).exec();
   }
 
@@ -66,36 +76,52 @@ export class OfferService implements IOfferService {
     const [offer]: DocumentType<OfferEntity>[] = await this.offerModel.aggregate<DocumentType<OfferEntity>>(
       [
         { $match: { _id: new mongoose.Types.ObjectId(id) } },
-        ...lookupPipelines,
-        addedOfferExtraFields,
-        { $unset: ['comments', 'favorites'] },
-        { $sort: { postDate: SortType.Down }},
+        commentsLookup,
+        usersLookup,
+        {
+          $addFields: {
+            ...addCommentsCountAndRatingFields,
+            isFavourite: { $toBool: { $size: '$favourites'} }
+          }
+        },
+        sortPipelineStage,
         { $limit: 1 }
       ]
     ).exec();
-    return this.offerModel.populate(offer, {path: 'userId'});
+    return this.offerModel.populate(offer, { path: 'userId' });
   }
 
   public fetchPremiumByCity(city: string): Promise<DocumentType<OfferEntity>[]> {
     return this.offerModel.aggregate<DocumentType<OfferEntity>>([
-      { $match: { city, isPremium: true } },
-      ...lookupPipelines,
-      addedOfferExtraFields,
-      { $unset: ['comments', 'favorites'] },
+      { $match: { $expr: { $eq: [ {$toLower: '$city'}, city.toLowerCase() ] } } },
+      { $match: { isPremium: true }},
+      commentsLookup,
+      usersLookup,
+      {
+        $addFields: {
+          ...addCommentsCountAndRatingFields,
+          isFavourite: { $toBool: { $size: '$favourites'} }
+        }
+      },
       { $sort: { postDate: SortType.Down }},
       { $limit: MAX_RETRIEVE_PREMIUM_OFFERS },
     ]).exec();
   }
 
 
-  public fetchFavourites(): Promise<DocumentType<OfferEntity>[]> {
+  public fetchFavourites(userId: string): Promise<DocumentType<OfferEntity>[]> {
     return this.offerModel.aggregate<DocumentType<OfferEntity>>([
-      ...lookupPipelines,
-      addedOfferExtraFields,
-      { $addFields: { isFavourite: { $toBool: { $size: '$favourites'} }}},
+      commentsLookup,
+      usersLookup,
+      {
+        $addFields: {
+          ...addCommentsCountAndRatingFields,
+          isFavourite: { $toBool: { $size: '$favourites'} }
+        }
+      },
+      { $match: { $expr: { $eq: [ {$toString: '$userId'}, userId ] } } },
       { $match: { isFavourite: true }},
-      { $unset: ['comments', 'favorites'] },
-      { $sort: { postDate: SortType.Down }},
+      sortPipelineStage,
     ]).exec();
   }
 

@@ -65,4 +65,16 @@ export const configApplicationSchema = convict<ApplicationSchema>({
     env: 'STATIC_DIRECTORY',
     default: null
   },
+  JWT_SECRET: {
+    doc: 'JWT secret',
+    format: String,
+    env: 'JWT_SECRET',
+    default: null
+  },
+  JWT_EXPIRED: {
+    doc: 'JWT expired time',
+    format: String,
+    env: 'JWT_EXPIRED',
+    default: null
+  },
 });

@@ -41,6 +41,11 @@ export class UserEntity extends BaseDocument {
   public setPassword(salt: string) {
     this.password = getGeneratedSHA256(this.password, salt);
   }
+
+  public verifyPassword(password: string, salt: string) {
+    const hashPassword: string = getGeneratedSHA256(password, salt);
+    return hashPassword === this.password;
+  }
 }
 
 export const UserModel = getModelForClass(UserEntity);

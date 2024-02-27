@@ -1,6 +1,7 @@
 ### Getting all offers (?limit=number can be used)
 GET http://localhost:4000/offers
 Accept: application/json
+Authorization: Bearer
 
 ### Getting an offer by id (full data)
 GET http://localhost:4000/offers/65caa630ae538f90a64b3c9d
@@ -13,14 +14,15 @@ Accept: application/json
 ### Getting premium offers by city
 GET http://localhost:4000/offers/favourites
 Accept: application/json
+Authorization: Bearer
 
 ### Adding an user offer
 POST http://localhost:4000/offers/create
 Content-Type: application/json
+Authorization: Bearer
 
 {
   "name": "Snooze Lodge",
-  "userId": "65caa630ae538f90a64b3c9a",
   "price": 31405,
   "type": "room",
   "isFavourite": false,
@@ -54,6 +56,7 @@ Content-Type: application/json
 ### Updating an existing offer
 PATCH http://localhost:4000/offers/patch/65caa630ae538f90a64b3c9d
 Content-Type: application/json
+Authorization: Bearer
 
 {
   "name": "New name",
@@ -63,3 +66,4 @@ Content-Type: application/json
 ### Deliting an existing offer
 DELETE http://localhost:4000/offers/delete/65caa630ae538f90a64b3c9d
 Content-Type: application/json
+Authorization: Bearer

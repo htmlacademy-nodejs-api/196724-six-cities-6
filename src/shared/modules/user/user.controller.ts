@@ -1,32 +1,33 @@
 import {Controller, HttpMethod} from '../../libs/controller/index.js';
-import {inject, injectable} from 'inversify';
-import {Components } from '../../types/index.js';
-import {ILogger} from '../../libs/logger/index.js';
-import {IUserService} from './user-service.interface.js';
-import {Response} from 'express';
-import {fillDto } from '../../utils/index.js';
-import {UserRdo} from './rdos/index.js';
-import {
-  AddUserFavouriteOfferRequest,
-  CreateUserRequest,
-  GetUserRequest,
-  LoginUserRequest,
-  RemoveUserFavouriteOfferRequest,
-  UploadUserAvatarRequest
-} from './types/index.js';
-import {HttpError} from '../../libs/exeption-filter/index.js';
-import {StatusCodes} from 'http-status-codes';
-import {IOfferService} from '../offer/index.js';
 import {
   DocumentExistsMiddleware,
   IMiddleware,
-  UploadFileMiddleware,
+  PrivateRouteMiddleware, UploadFileMiddleware,
   ValidateDtoMiddleware,
   ValidateObjectIdMiddleware
 } from '../../libs/middleware/index.js';
+import {inject, injectable} from 'inversify';
+import {Components} from '../../types/index.js';
+import {ILogger} from '../../libs/logger/index.js';
+import {IUserService} from './user-service.interface.js';
+import {IOfferService} from '../offer/index.js';
+import {IAuthService} from '../auth/index.js';
+import {ApplicationSchema, IConfig} from '../../libs/config/index.js';
 import {AddUserFavouriteOfferDto, CreateUserDto, LoginUserDto} from './dtos/index.js';
 import {userAddFavouriteOfferValidator, userCreateValidator, userLoginValidator} from './validators/index.js';
-import {ApplicationSchema, IConfig} from '../../libs/config/index.js';
+import {
+  AddUserFavouriteOfferRequest,
+  CreateUserRequest,
+  LoginUserRequest,
+  RemoveUserFavouriteOfferRequest
+} from './types/index.js';
+import {Request, Response} from 'express';
+import {HttpError} from '../../libs/exeption-filter/index.js';
+import {StatusCodes} from 'http-status-codes';
+import {fillDto} from '../../utils/index.js';
+import {LoginUserRdo, UserRdo} from './rdos/index.js';
+import {UserEntity} from './user.entity.js';
+
 
 @injectable()
 export class UserController extends Controller {
@@ -36,12 +37,13 @@ export class UserController extends Controller {
     @inject(Components.Logger) protected readonly logger: ILogger,
     @inject(Components.UserService) private readonly userService: IUserService,
     @inject(Components.OfferService) private readonly offerService: IOfferService,
+    @inject(Components.AuthService) private readonly authService: IAuthService,
     @inject(Components.Config) private readonly config: IConfig<ApplicationSchema>,
   ) {
     super(logger);
     this.logger.info('Register routes for UserController ...');
 
-    this.validateObjectIdMiddleware = new ValidateObjectIdMiddleware(['id', 'offerId']);
+    this.validateObjectIdMiddleware = new ValidateObjectIdMiddleware(['offerId']);
 
     this.addRoute({
       path: '/create',
@@ -59,24 +61,28 @@ export class UserController extends Controller {
     });
 
     this.addRoute({
-      path: '/:id/offers/favourite/add',
+      path: '/check',
+      method: HttpMethod.Get,
+      handler: this.check,
+      middleware: [new PrivateRouteMiddleware()]
+    });
+
+    this.addRoute({
+      path: '/offers/favourite/add',
       method: HttpMethod.Post,
       handler: this.addFavouriteOffer,
-      middleware: [this.validateObjectIdMiddleware, new ValidateDtoMiddleware(AddUserFavouriteOfferDto, userAddFavouriteOfferValidator)]
+      middleware: [
+        new PrivateRouteMiddleware(),
+        this.validateObjectIdMiddleware,
+        new ValidateDtoMiddleware(AddUserFavouriteOfferDto, userAddFavouriteOfferValidator)
+      ]
     });
 
     this.addRoute({
-      path: '/:id',
-      method: HttpMethod.Get,
-      handler: this.getById,
-      middleware: [this.validateObjectIdMiddleware]
-    });
-
-    this.addRoute({
-      path: '/:id/offers/favourite/:offerId/remove',
+      path: '/offers/favourite/:offerId/remove',
       method: HttpMethod.Delete,
       handler: this.removeFavouriteOffer,
-      middleware: [this.validateObjectIdMiddleware]
+      middleware: [new PrivateRouteMiddleware(), this.validateObjectIdMiddleware]
     });
 
     this.addRoute({
@@ -84,6 +90,7 @@ export class UserController extends Controller {
       method: HttpMethod.Post,
       handler: this.uploadAvatar,
       middleware: [
+        new PrivateRouteMiddleware(),
         new UploadFileMiddleware(this.config.get('UPLOAD_DIRECTORY'), 'avatar'),
         this.validateObjectIdMiddleware,
         new DocumentExistsMiddleware(this.userService, 'User', 'id'),
@@ -91,8 +98,7 @@ export class UserController extends Controller {
     });
   }
 
-  public async create(req: CreateUserRequest, res: Response) {
-    const { body} = req;
+  public async create({ body }: CreateUserRequest, res: Response) {
     const existsUser = await this.userService.findByEmail(body.email);
 
     if (existsUser) {
@@ -106,47 +112,31 @@ export class UserController extends Controller {
     this.created(res, fillDto(UserRdo, result));
   }
 
-  public async login(req: LoginUserRequest, res: Response) {
-    const { body} = req;
-    const result = await this.userService.login(body);
+  public async login({ body }: LoginUserRequest, res: Response) {
+    const user: UserEntity | null = await this.authService.verify(body);
 
-    if (result){
-      return this.success(res, { accessToken: '1' }); // @TODO not completed yet
+    if (user) {
+      const accessToken: string = await this.authService.authenticate(user);
+      const data: LoginUserRdo = fillDto(LoginUserRdo, { accessToken });
+      return this.success(res, data);
+    } else {
+      throw new HttpError(
+        StatusCodes.NOT_FOUND,
+        `User with email «${body.email}».`,
+        'UserController'
+      );
     }
-
-    throw new HttpError(
-      StatusCodes.NOT_FOUND,
-      `User with email «${body.email}» or password does not match any user details.`,
-      'UserController'
-    );
   }
 
-  public async check(req: GetUserRequest, res: Response) {
-    // @TODO not completed yet
-    const result = await this.userService.findById(req.params.id);
+  public async check({ tokenPayload: { id }}: Request, res: Response) {
+    const result = await this.userService.findById(id);
     this.success(res, fillDto(UserRdo, result));
   }
 
-
-  public async getById(req: GetUserRequest, res: Response) {
-    const result = await this.userService.findById(req.params.id);
-    if (result){
-      return this.success(res, fillDto(UserRdo, result));
-    }
-
-    throw new HttpError(
-      StatusCodes.NOT_FOUND,
-      `User with id «${req.params.id}» not found.`,
-      'UserController'
-    );
-  }
-
-  public async addFavouriteOffer(req: AddUserFavouriteOfferRequest, res: Response) {
-    const { body} = req;
+  public async addFavouriteOffer({ body, tokenPayload: { id }}: AddUserFavouriteOfferRequest, res: Response) {
     const isOfferExist = await this.offerService.exists(body.offerId);
-
     if (isOfferExist) {
-      const result = await this.userService.addFavouriteOffer(req.params.id, body.offerId);
+      const result = await this.userService.addFavouriteOffer(id, body.offerId);
       this.success(res, fillDto(UserRdo, result));
     } else {
       throw new HttpError(
@@ -157,22 +147,21 @@ export class UserController extends Controller {
     }
   }
 
-  public async removeFavouriteOffer(req: RemoveUserFavouriteOfferRequest, res: Response) {
-    const result = await this.userService.removeFavouriteOffer(req.params.id, req.params.offerId);
+  public async removeFavouriteOffer({tokenPayload: { id }, params: { offerId }}: RemoveUserFavouriteOfferRequest, res: Response) {
+    const result = await this.userService.removeFavouriteOffer(id, offerId);
     this.success(res, fillDto(UserRdo, result));
   }
 
-  public async uploadAvatar(req: UploadUserAvatarRequest, res: Response): Promise<void> {
-    const { params} = req;
+  public async uploadAvatar({tokenPayload: { id }, file}: Request, res: Response): Promise<void> {
 
-    if (params.id && req.file?.filename) {
-      const result = await this.userService.uploadAvatar(params.id, req.file?.filename);
+    if (file?.filename) {
+      const result = await this.userService.uploadAvatar(id, file?.filename);
       return this.success(res, fillDto(UserRdo, result));
     }
 
     throw new HttpError(
       StatusCodes.BAD_REQUEST,
-      `Not able to read user id: ${params.id}.`,
+      `Not able to read user id: ${id}.`,
       'UserController'
     );
   }

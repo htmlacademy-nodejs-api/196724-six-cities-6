@@ -8,6 +8,7 @@ import express, {Express} from 'express';
 import { ApplicationRoutes, IController } from '../shared/libs/controller/index.js';
 import {Components, Storage} from '../shared/types/index.js';
 import { IExceptionFilter } from '../shared/libs/exeption-filter/index.js';
+import { IMiddleware, ParseTokenMiddleware } from '../shared/libs/middleware/index.js';
 
 @injectable()
 export class Application implements IApplication {
@@ -42,6 +43,7 @@ export class Application implements IApplication {
   }
 
   private async initializeMiddleware() {
+    const authenticateMiddleware: IMiddleware = new ParseTokenMiddleware(this.config.get('JWT_SECRET'));
     this.server.use(express.json());
     this.server.use(
       Storage.upload,
@@ -51,6 +53,7 @@ export class Application implements IApplication {
       Storage.static,
       express.static(this.config.get('STATIC_DIRECTORY'))
     );
+    this.server.use(authenticateMiddleware.execute.bind(authenticateMiddleware));
   }
 
   private async initializeControllers() {
