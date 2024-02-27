@@ -127,6 +127,24 @@ paths:
                 $ref: '#/components/schemas/User'
         "404":
           description: Offer not found.
+  /users/{id}/avatar:
+    post:
+      tags:
+        - USERS
+      summary: A user avatar upload.
+      description: A user avatar.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: User id.
+      responses:
+        "200":
+          description: A user avatar uploaded.
+        "404":
+          description: A user with this id not found.
 
   /offers/create:
     post:

@@ -11,6 +11,12 @@ export const configApplicationSchema = convict<ApplicationSchema>({
     env: 'PORT',
     default: null
   },
+  HOST: {
+    doc: 'Local host name.',
+    format: String,
+    env: 'HOST',
+    default: null
+  },
   SALT: {
     doc: 'Password hush.',
     format: String,
@@ -45,6 +51,18 @@ export const configApplicationSchema = convict<ApplicationSchema>({
     doc: 'Database name.',
     format: String,
     env: 'DB_NAME',
+    default: null
+  },
+  UPLOAD_DIRECTORY: {
+    doc: 'Directory for upload files',
+    format: String,
+    env: 'UPLOAD_DIRECTORY',
+    default: null
+  },
+  STATIC_DIRECTORY: {
+    doc: 'Directory for static files',
+    format: String,
+    env: 'STATIC_DIRECTORY',
     default: null
   },
   JWT_SECRET: {

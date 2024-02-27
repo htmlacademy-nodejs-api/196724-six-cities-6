@@ -1,4 +1,5 @@
 import { ClassConstructor, plainToInstance } from 'class-transformer';
+import {Storage} from '../types/index.js';
 
 export const getMongoUrl = (
   args: {
@@ -35,3 +36,10 @@ export function createErrorObject(message: string) {
     error: message,
   };
 }
+
+export const getStorageUrl = (args: {
+  host: string,
+  port: number,
+  storage: Storage,
+  fileName?: string
+}) => `http://${args.host}:${args.port}${args.storage}/${args.fileName}`;

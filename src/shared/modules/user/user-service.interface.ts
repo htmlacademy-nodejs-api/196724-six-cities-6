@@ -5,6 +5,7 @@ import { IService } from '../../types/index.js';
 
 export interface IUserService extends IService{
   create(dto: CreateUserDto): Promise<DocumentType<UserEntity>>;
+  uploadAvatar(id: string, fileName: string): Promise<DocumentType<UserEntity> | null>;
   findById(id: string): Promise<DocumentType<UserEntity> | null>;
   findByEmail(email: string): Promise<DocumentType<UserEntity> | null>;
   login(dto: LoginUserDto): Promise<DocumentType<UserEntity> | null>;

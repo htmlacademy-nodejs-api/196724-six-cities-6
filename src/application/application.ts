@@ -6,7 +6,7 @@ import { IDatabaseClient } from '../shared/libs/database-client/index.js';
 import { getMongoUrl } from '../shared/utils/database.js';
 import express, {Express} from 'express';
 import { ApplicationRoutes, IController } from '../shared/libs/controller/index.js';
-import { Components } from '../shared/types/index.js';
+import {Components, Storage} from '../shared/types/index.js';
 import { IExceptionFilter } from '../shared/libs/exeption-filter/index.js';
 import { IMiddleware, ParseTokenMiddleware } from '../shared/libs/middleware/index.js';
 
@@ -38,12 +38,21 @@ export class Application implements IApplication {
 
   private async initializeServer() {
     const port = this.config.get('PORT');
-    this.server.listen(port);
+    const host = this.config.get('HOST');
+    this.server.listen(port,host);
   }
 
   private async initializeMiddleware() {
     const authenticateMiddleware: IMiddleware = new ParseTokenMiddleware(this.config.get('JWT_SECRET'));
     this.server.use(express.json());
+    this.server.use(
+      Storage.upload,
+      express.static(this.config.get('UPLOAD_DIRECTORY'))
+    );
+    this.server.use(
+      Storage.static,
+      express.static(this.config.get('STATIC_DIRECTORY'))
+    );
     this.server.use(authenticateMiddleware.execute.bind(authenticateMiddleware));
   }
 

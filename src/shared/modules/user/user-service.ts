@@ -1,14 +1,15 @@
 import { DocumentType, types } from '@typegoose/typegoose';
 import { UserEntity } from './user.entity.js';
-import { IUserService } from './user-service.interface.js';
+import { IUserService} from './user-service.interface.js';
 import { inject, injectable } from 'inversify';
-import { Components } from '../../types/index.js';
-import { ILogger } from '../../libs/logger/index.js';
-import { LoginUserDto, CreateUserDto } from './dtos/index.js';
+import { Components, Storage } from '../../types/index.js';
+import { ILogger} from '../../libs/logger/index.js';
+import { CreateUserDto, LoginUserDto } from './dtos/index.js';
 import { ApplicationSchema, IConfig } from '../../libs/config/index.js';
-import { getGeneratedSHA256 } from '../../utils/index.js';
+import { getGeneratedSHA256, getStorageUrl } from '../../utils/index.js';
 import mongoose from 'mongoose';
 
+const DEFAULT_AVATAR_FILE_NAME: string = 'default_avatar.png';
 @injectable()
 export class UserService implements IUserService {
   constructor(
@@ -17,24 +18,51 @@ export class UserService implements IUserService {
     @inject(Components.Config) public readonly config?: IConfig<ApplicationSchema>
   ) {}
 
-  get salt() {
-    return this.config && this.config.get('SALT');
+  private get salt() {
+    return this.config?.get('SALT');
+  }
+
+  private get port() {
+    return this.config?.get('PORT');
+  }
+
+  private get host() {
+    return this.config?.get('HOST');
   }
 
   public async create(dto: CreateUserDto): Promise<DocumentType<UserEntity>> {
     const user = new UserEntity(dto);
 
-    if (this.salt) {
+    if (this.salt && this.host && this.port) {
       user.setPassword(this.salt);
-      const result = await this.userModel.create(user);
+      const avatarUrl: string = getStorageUrl({
+        port: this.port,
+        host: this.host,
+        storage: Storage.static,
+        fileName: DEFAULT_AVATAR_FILE_NAME
+      });
+
+      const result = await this.userModel.create({...user, avatarUrl});
       this.logger.info(`New user created: ${user.email}`);
       return result;
     }
 
-    throw Error('SALT has not been provided for password hashing.');
+    throw Error('SALT, HOST, or POrt has not been provided for password hashing.');
   }
 
-  public async findById(id: string): Promise<DocumentType<UserEntity> | null> {
+  public async uploadAvatar(id: string, fileName: string): Promise<DocumentType<UserEntity> | null> {
+    if (this.host && this.port) {
+      const avatarUrl: string = getStorageUrl({ port: this.port, host: this.host,storage: Storage.upload, fileName });
+      const result = await this.userModel.findByIdAndUpdate(id, { avatarUrl }, { new: true }).exec();
+      this.logger.info(`User (${ result?.name }) details  updated.`);
+      return result;
+    }
+
+    throw Error('SALT, HOST, or POrt has not been provided for password hashing.');
+
+  }
+
+  public findById(id: string): Promise<DocumentType<UserEntity> | null> {
     const user = this.userModel.findById(id).exec();
     if (user) {
       return user;

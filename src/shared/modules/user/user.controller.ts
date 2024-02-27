@@ -6,12 +6,34 @@ import { IUserService } from './user-service.interface.js';
 import {Request, Response} from 'express';
 import { fillDto } from '../../utils/index.js';
 import {LoginUserRdo, UserRdo} from './rdos/index.js';
+import {Controller, HttpMethod} from '../../libs/controller/index.js';
+import {inject, injectable} from 'inversify';
+import {Components } from '../../types/index.js';
+import {ILogger} from '../../libs/logger/index.js';
+import {IUserService} from './user-service.interface.js';
+import {Response} from 'express';
+import {fillDto } from '../../utils/index.js';
+import {UserRdo} from './rdos/index.js';
 import {
   AddUserFavouriteOfferRequest,
   CreateUserRequest,
   LoginUserRequest,
-  RemoveUserFavouriteOfferRequest
+  RemoveUserFavouriteOfferRequest,
+  UploadUserAvatarRequest
 } from './types/index.js';
+import {HttpError} from '../../libs/exeption-filter/index.js';
+import {StatusCodes} from 'http-status-codes';
+import {IOfferService} from '../offer/index.js';
+import {
+  DocumentExistsMiddleware,
+  IMiddleware,
+  UploadFileMiddleware,
+  ValidateDtoMiddleware,
+  ValidateObjectIdMiddleware
+} from '../../libs/middleware/index.js';
+import {AddUserFavouriteOfferDto, CreateUserDto, LoginUserDto} from './dtos/index.js';
+import {userAddFavouriteOfferValidator, userCreateValidator, userLoginValidator} from './validators/index.js';
+import {ApplicationSchema, IConfig} from '../../libs/config/index.js';
 import { HttpError } from '../../libs/exeption-filter/index.js';
 import { StatusCodes } from 'http-status-codes';
 import { IOfferService } from '../offer/index.js';
@@ -28,13 +50,14 @@ import { UserEntity } from './user.entity.js';
 
 @injectable()
 export class UserController extends Controller {
-  private readonly validateObjectIdMiddleware: ValidateObjectIdMiddleware = new ValidateObjectIdMiddleware(['id', 'offerId']);
+  private readonly validateObjectIdMiddleware: IMiddleware;
 
   constructor(
     @inject(Components.Logger) protected readonly logger: ILogger,
     @inject(Components.UserService) private readonly userService: IUserService,
     @inject(Components.OfferService) private readonly offerService: IOfferService,
     @inject(Components.AuthService) private readonly authService: IAuthService,
+    @inject(Components.Config) private readonly config: IConfig<ApplicationSchema>,
   ) {
     super(logger);
     this.logger.info('Register routes for UserController ...');
@@ -80,6 +103,17 @@ export class UserController extends Controller {
       handler: this.removeFavouriteOffer,
       middleware: [new PrivateRouteMiddleware(), this.validateObjectIdMiddleware]
     });
+
+    this.addRoute({
+      path: '/:id/avatar',
+      method: HttpMethod.Post,
+      handler: this.uploadAvatar,
+      middleware: [
+        new UploadFileMiddleware(this.config.get('UPLOAD_DIRECTORY'), 'avatar'),
+        this.validateObjectIdMiddleware,
+        new DocumentExistsMiddleware(this.userService, 'User', 'id'),
+      ]
+    });
   }
 
   public async create(req: CreateUserRequest, res: Response) {
@@ -93,7 +127,6 @@ export class UserController extends Controller {
         'UserController'
       );
     }
-
     const result = await this.userService.create(body);
     this.created(res, fillDto(UserRdo, result));
   }
@@ -139,5 +172,20 @@ export class UserController extends Controller {
   public async removeFavouriteOffer(req: RemoveUserFavouriteOfferRequest, res: Response) {
     const result = await this.userService.removeFavouriteOffer(req.tokenPayload.id, req.params.offerId);
     this.success(res, fillDto(UserRdo, result));
+  }
+
+  public async uploadAvatar(req: UploadUserAvatarRequest, res: Response): Promise<void> {
+    const { params} = req;
+
+    if (params.id && req.file?.filename) {
+      const result = await this.userService.uploadAvatar(params.id, req.file?.filename);
+      return this.success(res, fillDto(UserRdo, result));
+    }
+
+    throw new HttpError(
+      StatusCodes.BAD_REQUEST,
+      `Not able to read user id: ${params.id}.`,
+      'UserController'
+    );
   }
 }
