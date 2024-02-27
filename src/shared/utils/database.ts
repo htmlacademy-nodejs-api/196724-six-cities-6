@@ -1,4 +1,3 @@
-import { ClassConstructor, plainToInstance } from 'class-transformer';
 import {Storage} from '../types/index.js';
 
 export const getMongoUrl = (
@@ -26,16 +25,6 @@ export const retryConnection = async (options: {callback: () => Promise<void>, o
     }
   }
 };
-
-export function fillDto<T, V>(someDto: ClassConstructor<T>, plainObject: V) {
-  return plainToInstance(someDto, plainObject, { excludeExtraneousValues: true, exposeUnsetFields: false });
-}
-
-export function createErrorObject(message: string) {
-  return {
-    error: message,
-  };
-}
 
 export const getStorageUrl = (args: {
   host: string,

@@ -49,9 +49,7 @@ export class CommentController extends Controller {
     });
   }
 
-  public async create(req: CreateCommentRequest, res: Response) {
-    const { body, tokenPayload} = req;
-    const { id} = tokenPayload;
+  public async create({ body, tokenPayload: { id }}: CreateCommentRequest, res: Response) {
     const isOfferExist = await this.offerService.exists(body.offerId);
     if (isOfferExist) {
       const result = await this.commentService.create({...body, userId: id});
@@ -65,8 +63,7 @@ export class CommentController extends Controller {
     );
   }
 
-  public async fetchByOfferId(req: GetOfferCommentsRequest, res: Response) {
-    const { id } = req.params;
+  public async fetchByOfferId({ params: { id } } : GetOfferCommentsRequest, res: Response) {
     const result = await this.commentService.fetchByOfferId(id);
 
     if (result.length) {

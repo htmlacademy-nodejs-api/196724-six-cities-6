@@ -10,4 +10,5 @@ export type ApplicationSchema = {
   UPLOAD_DIRECTORY: string;
   STATIC_DIRECTORY: string;
   JWT_SECRET: string;
+  JWT_EXPIRED: string;
 }

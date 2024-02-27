@@ -88,14 +88,11 @@ export class OfferController extends Controller {
     });
   }
 
-  public async fetch(req: GetOffersRequestType, res: Response) {
-    const { query: { limit}, tokenPayload} = req;
-
+  public async fetch({ query: { limit }, tokenPayload: { id }}: GetOffersRequestType, res: Response) {
     const isValidLimit: boolean = limit ? isNumber(limit) : true;
-
     if (isValidLimit) {
       const parsedLimit: number | undefined = limit ? Number(limit) : undefined;
-      const offers = await this.offerService.fetch(tokenPayload?.id, parsedLimit);
+      const offers = await this.offerService.fetch(id, parsedLimit);
       if (offers.length) {
         return this.success(res, fillDto(OfferLiteRdo, offers));
       }
@@ -109,8 +106,7 @@ export class OfferController extends Controller {
     );
   }
 
-  public async getById(req: GetOfferRequestType, res: Response) {
-    const { params: { id }} = req;
+  public async getById({ params: { id }}: GetOfferRequestType, res: Response) {
     const offer = await this.offerService.findById(id);
     if (offer) {
       return this.success(res, fillDto(OfferRdo, offer));
@@ -123,8 +119,7 @@ export class OfferController extends Controller {
     );
   }
 
-  public async getPremiumByCity(req: GetPremiumOffersRequest, res: Response) {
-    const { query: { city}} = req;
+  public async getPremiumByCity({ query: { city }}: GetPremiumOffersRequest, res: Response) {
 
     if(typeof city === 'string') {
       const offers = await this.offerService.fetchPremiumByCity(city.trim());
@@ -140,8 +135,7 @@ export class OfferController extends Controller {
     );
   }
 
-  public async getFavourites(req: Request, res: Response) {
-    const { tokenPayload: { id} } = req;
+  public async getFavourites({ tokenPayload: { id } }: Request, res: Response) {
     const offers = await this.offerService.fetchFavourites(id);
     if (offers.length) {
       return this.success(res, fillDto(OfferLiteRdo, offers));
@@ -150,38 +144,33 @@ export class OfferController extends Controller {
     return this.noContent(res, fillDto(OfferLiteRdo, offers));
   }
 
-  public async delete(req: GetOffersRequestType, res: Response) {
-    const { params} = req;
-
-    if (params.id) {
-      const result = await this.offerService.delete(params.id);
+  public async delete({ params: { id } }: GetOffersRequestType, res: Response) {
+    if (id) {
+      const result = await this.offerService.delete(id);
       return this.success(res, fillDto(OfferRdo, result));
     }
 
     throw new HttpError(
       StatusCodes.BAD_REQUEST,
-      `Not able to read offer id: ${params.id}.`,
+      `Not able to read offer id: ${id}.`,
       'OfferController'
     );
   }
 
-  public async create(req: CreateOffersRequestType, res: Response) {
-    const { body, tokenPayload} = req;
-    const result = await this.offerService.create({ ...body, userId: tokenPayload.id });
+  public async create({ body, tokenPayload: { id } }: CreateOffersRequestType, res: Response) {
+    const result = await this.offerService.create({ ...body, userId: id });
     return this.created(res, fillDto(OfferRdo, result));
   }
 
-  public async patch(req: PatchOffersRequestType, res: Response) {
-    const { body, params} = req;
-
-    if (params.id) {
-      const result = await this.offerService.update(params.id, body);
+  public async patch({ body, params: { id }}: PatchOffersRequestType, res: Response) {
+    if (id) {
+      const result = await this.offerService.update(id, body);
       return this.success(res, fillDto(OfferRdo, result));
     }
 
     throw new HttpError(
       StatusCodes.BAD_REQUEST,
-      `Not able to read offer id: ${params.id}.`,
+      `Not able to read offer id: ${id}.`,
       'OfferController'
     );
   }

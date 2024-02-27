@@ -5,9 +5,9 @@ import { Components } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { ApplicationSchema, IConfig } from '../../libs/config/index.js';
 import * as crypto from 'node:crypto';
-import {JWT_ALGORITHM, JWT_EXPIRED, TokenPayload} from './types/index.js';
-import {SignJWT} from 'jose';
-import {UserNotFoundException, UserPasswordIncorrectException} from './errors/index.js';
+import { JWT_ALGORITHM, TokenPayload } from './types/index.js';
+import { SignJWT } from 'jose';
+import { UserNotFoundException, UserPasswordIncorrectException } from './errors/index.js';
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -19,9 +19,9 @@ export class AuthService implements IAuthService {
 
   public authenticate(user: UserEntity): Promise<string> {
     const jwtSecret: string = this.config.get('JWT_SECRET');
+    const jwtExpiredTime: string = this.config.get('JWT_EXPIRED');
     const secretKey = crypto.createSecretKey(jwtSecret, 'utf-8');
     const tokenPayload: TokenPayload = {
-      email: user.email,
       id: user.id,
     };
 
@@ -29,7 +29,7 @@ export class AuthService implements IAuthService {
     return new SignJWT(tokenPayload)
       .setProtectedHeader({ alg: JWT_ALGORITHM })
       .setIssuedAt()
-      .setExpirationTime(JWT_EXPIRED)
+      .setExpirationTime(jwtExpiredTime)
       .sign(secretKey);
   }
 
