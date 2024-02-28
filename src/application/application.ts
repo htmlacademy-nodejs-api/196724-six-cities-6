@@ -9,7 +9,7 @@ import { ApplicationRoutes, IController } from '../shared/libs/controller/index.
 import {Components, Storage} from '../shared/types/index.js';
 import { IExceptionFilter } from '../shared/libs/exeption-filter/index.js';
 import { IMiddleware, ParseTokenMiddleware } from '../shared/libs/middleware/index.js';
-
+import cors from 'cors';
 @injectable()
 export class Application implements IApplication {
   private readonly server: Express;
@@ -54,6 +54,7 @@ export class Application implements IApplication {
       express.static(this.config.get('STATIC_DIRECTORY'))
     );
     this.server.use(authenticateMiddleware.execute.bind(authenticateMiddleware));
+    this.server.use(cors());
   }
 
   private async initializeControllers() {
