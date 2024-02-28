@@ -3,8 +3,8 @@ import { jwtVerify } from 'jose';
 import { StatusCodes } from 'http-status-codes';
 import { createSecretKey } from 'node:crypto';
 import { IMiddleware } from './middleware.interface.js';
-import { HttpError } from '../exeption-filter/index.js';
 import { isTokenPayload } from '../../utils/index.js';
+import { HttpError } from '../errors/index.js';
 
 export class ParseTokenMiddleware implements IMiddleware {
   constructor(private readonly jwtSecret: string) {}

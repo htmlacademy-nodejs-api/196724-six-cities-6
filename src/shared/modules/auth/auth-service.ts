@@ -7,7 +7,7 @@ import { ApplicationSchema, IConfig } from '../../libs/config/index.js';
 import * as crypto from 'node:crypto';
 import { JWT_ALGORITHM, TokenPayload } from './types/index.js';
 import { SignJWT } from 'jose';
-import { UserNotFoundException, UserPasswordIncorrectException } from './errors/index.js';
+import { UserNotFoundException, UserPasswordIncorrectException } from '../../libs/errors/index.js';
 
 @injectable()
 export class AuthService implements IAuthService {

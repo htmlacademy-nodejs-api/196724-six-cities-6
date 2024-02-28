@@ -22,11 +22,11 @@ import {
   RemoveUserFavouriteOfferRequest
 } from './types/index.js';
 import {Request, Response} from 'express';
-import {HttpError} from '../../libs/exeption-filter/index.js';
 import {StatusCodes} from 'http-status-codes';
 import {fillDto} from '../../utils/index.js';
 import {LoginUserRdo, UserRdo} from './rdos/index.js';
 import {UserEntity} from './user.entity.js';
+import {HttpError} from '../../libs/errors/index.js';
 
 
 @injectable()

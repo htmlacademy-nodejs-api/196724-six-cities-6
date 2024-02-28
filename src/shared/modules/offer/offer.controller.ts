@@ -10,7 +10,6 @@ import { Request, Response } from 'express';
 import { fillDto, isNumber } from '../../utils/index.js';
 
 import { OfferLiteRdo, OfferRdo } from './rdos/index.js';
-import { HttpError } from '../../libs/exeption-filter/index.js';
 import { StatusCodes } from 'http-status-codes';
 import { GetOfferRequestType } from './types/get-offer-request.type.js';
 import { GetPremiumOffersRequest } from './types/get-premium-offers-request.type.js';
@@ -21,6 +20,7 @@ import {
 } from '../../libs/middleware/index.js';
 import { CreateOfferDto, UpdateOfferDto } from './dtos/index.js';
 import { createOfferValidator, updateOfferValidator } from './validators/index.js';
+import {HttpError} from '../../libs/errors/index.js';
 
 @injectable()
 export class OfferController extends Controller {

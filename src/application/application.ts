@@ -20,7 +20,10 @@ export class Application implements IApplication {
     @inject(Components.UserController) private readonly userController: IController,
     @inject(Components.OfferController) private readonly offerController: IController,
     @inject(Components.CommentController) private readonly commentController: IController,
-    @inject(Components.ExceptionFilter) private readonly exceptionFilter: IExceptionFilter,
+    @inject(Components.AppExceptionFilter) private readonly appExceptionFilter: IExceptionFilter,
+    @inject(Components.HttpExceptionFilter) private readonly httpExceptionFilter: IExceptionFilter,
+    @inject(Components.ValidationExceptionFilter) private readonly validationExceptionFilter: IExceptionFilter,
+    @inject(Components.AuthExceptionFilter) private readonly authExceptionFilter: IExceptionFilter,
   ) {
     this.server = express();
   }
@@ -64,7 +67,10 @@ export class Application implements IApplication {
   }
 
   private async initializeExceptionFilters() {
-    this.server.use(this.exceptionFilter.catch.bind(this.exceptionFilter));
+    this.server.use(this.authExceptionFilter.catch.bind(this.authExceptionFilter));
+    this.server.use(this.validationExceptionFilter.catch.bind(this.validationExceptionFilter));
+    this.server.use(this.httpExceptionFilter.catch.bind(this.httpExceptionFilter));
+    this.server.use(this.appExceptionFilter.catch.bind(this.appExceptionFilter));
   }
 
   public async init() {
