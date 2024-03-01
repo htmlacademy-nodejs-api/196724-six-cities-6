@@ -7,7 +7,7 @@ import { CreateOffersRequestType, GetOffersRequestType, PatchOffersRequestType }
 
 import { IOfferService } from './offer-service.interface.js';
 import { Request, Response } from 'express';
-import { fillDto, isNumber } from '../../utils/index.js';
+import {fillDto, getRandomItem, getSlicedRandomArray, isNumber} from '../../utils/index.js';
 
 import { OfferLiteRdo, OfferRdo } from './rdos/index.js';
 import { StatusCodes } from 'http-status-codes';
@@ -19,8 +19,9 @@ import {
   ValidateObjectIdMiddleware
 } from '../../libs/middleware/index.js';
 import { CreateOfferDto, UpdateOfferDto } from './dtos/index.js';
-import { createOfferValidator, updateOfferValidator } from './validators/index.js';
+import {createOfferValidator, MIN_URLS, updateOfferValidator} from './validators/index.js';
 import {HttpError} from '../../libs/errors/index.js';
+import {OFFER_STATIC_URLS} from './offer.constants.js';
 
 @injectable()
 export class OfferController extends Controller {
@@ -69,7 +70,7 @@ export class OfferController extends Controller {
     });
 
     this.addRoute({
-      path: '/patch/:id',
+      path: '/update/:id',
       method: HttpMethod.Patch,
       handler: this.patch,
       middleware: [
@@ -88,11 +89,11 @@ export class OfferController extends Controller {
     });
   }
 
-  public async fetch({ query: { limit }, tokenPayload: { id }}: GetOffersRequestType, res: Response) {
+  public async fetch({ query: { limit }, tokenPayload}: GetOffersRequestType, res: Response) {
     const isValidLimit: boolean = limit ? isNumber(limit) : true;
     if (isValidLimit) {
       const parsedLimit: number | undefined = limit ? Number(limit) : undefined;
-      const offers = await this.offerService.fetch(id, parsedLimit);
+      const offers = await this.offerService.fetch(tokenPayload?.id, parsedLimit);
       if (offers.length) {
         return this.success(res, fillDto(OfferLiteRdo, offers));
       }
@@ -120,7 +121,6 @@ export class OfferController extends Controller {
   }
 
   public async getPremiumByCity({ query: { city }}: GetPremiumOffersRequest, res: Response) {
-
     if(typeof city === 'string') {
       const offers = await this.offerService.fetchPremiumByCity(city.trim());
       if (offers.length) {
@@ -158,7 +158,12 @@ export class OfferController extends Controller {
   }
 
   public async create({ body, tokenPayload: { id } }: CreateOffersRequestType, res: Response) {
-    const result = await this.offerService.create({ ...body, userId: id });
+    const result = await this.offerService.create({
+      ...body,
+      userId: id,
+      previewUrl: getRandomItem(OFFER_STATIC_URLS),
+      urls: getSlicedRandomArray(OFFER_STATIC_URLS, MIN_URLS)
+    });
     return this.created(res, fillDto(OfferRdo, result));
   }
 

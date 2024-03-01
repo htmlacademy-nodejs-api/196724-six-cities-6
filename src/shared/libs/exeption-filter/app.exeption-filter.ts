@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { IExceptionFilter } from './exeption-filter.interface.js';
 import { ILogger } from '../logger/index.js';
-import { ApplicationError, Components} from '../../types/index.js';
+import { ApplicationErrorType, Components} from '../../types/index.js';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { createErrorObject } from '../../utils/index.js';
@@ -18,6 +18,6 @@ export class AppExceptionFilter implements IExceptionFilter {
     this.logger.error(error.message, error);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(createErrorObject(ApplicationError.ServiceError, error.message));
+      .json(createErrorObject(ApplicationErrorType.ServiceError, error.message));
   }
 }

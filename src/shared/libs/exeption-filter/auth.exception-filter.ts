@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { IExceptionFilter } from './exeption-filter.interface.js';
 import { ILogger} from '../logger/index.js';
 import { BaseAuthException } from '../errors/index.js';
-import { ApplicationError, Components } from '../../types/index.js';
+import { ApplicationErrorType, Components } from '../../types/index.js';
 
 
 @injectable()
@@ -22,7 +22,7 @@ export class AuthExceptionFilter implements IExceptionFilter {
     this.logger.error(`[AuthModule] ${error.message}`, error);
     res.status(error.httpStatusCode)
       .json({
-        type: ApplicationError.Authorisation,
+        type: ApplicationErrorType.Authorisation,
         error: error.message,
       });
   }

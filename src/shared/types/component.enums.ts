@@ -1,3 +1,4 @@
+
 export const Components = {
   CliApplication: Symbol.for('CliApplication'),
   Application: Symbol.for('Application'),
@@ -23,4 +24,5 @@ export const Components = {
   HttpExceptionFilter: Symbol.for('HttpExceptionFilter'),
   ValidationExceptionFilter: Symbol.for('ValidationExceptionFilter'),
   AuthExceptionFilter: Symbol.for('AuthExceptionFilter'),
+  StoragePathTransformer: Symbol.for('StoragePathTransformer'),
 } as const;

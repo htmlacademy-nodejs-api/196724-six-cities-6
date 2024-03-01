@@ -7,3 +7,4 @@ export * from './types/index.js';
 export * from './offer-service.pipelines.js';
 export * from './offer.container.js';
 export * from './offer.controller.js';
+export * from './offer.constants.js';

@@ -1,13 +1,13 @@
 import { ClassConstructor, plainToInstance } from 'class-transformer';
 import { TokenPayload } from '../modules/auth/index.js';
-import {ApplicationError, ValidationErrorField} from '../types/index.js';
+import {ApplicationError, ApplicationErrorType, ValidationErrorField} from '../types/index.js';
 import { ValidationErrorItem } from 'joi';
 
 export function fillDto<T, V>(someDto: ClassConstructor<T>, plainObject: V) {
   return plainToInstance(someDto, plainObject, {excludeExtraneousValues: true, exposeUnsetFields: false});
 }
 
-export function createErrorObject(errorType: ApplicationError, error: string, details: ValidationErrorField[] = []) {
+export function createErrorObject(errorType: ApplicationErrorType, error: string, details: ValidationErrorField[] = []): ApplicationError<ValidationErrorField> {
   return { errorType, error, details };
 }
 
@@ -18,7 +18,7 @@ export const isTokenPayload = (payload: unknown): payload is TokenPayload => (
 
 export const reduceValidationErrors = (errors: ValidationErrorItem[]): ValidationErrorField[] =>
   errors.map(({ message, context}) => ({
-    property: context?.key,
+    property: context?.label,
     value: context?.value,
     message
   }));

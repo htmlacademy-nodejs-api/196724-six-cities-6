@@ -19,7 +19,7 @@ import {
   AddUserFavouriteOfferRequest,
   CreateUserRequest,
   LoginUserRequest,
-  RemoveUserFavouriteOfferRequest
+  RemoveUserFavouriteOfferRequest, UploadUserAvatarRequest
 } from './types/index.js';
 import {Request, Response} from 'express';
 import {StatusCodes} from 'http-status-codes';
@@ -27,7 +27,6 @@ import {fillDto} from '../../utils/index.js';
 import {LoginUserRdo, UserRdo} from './rdos/index.js';
 import {UserEntity} from './user.entity.js';
 import {HttpError} from '../../libs/errors/index.js';
-
 
 @injectable()
 export class UserController extends Controller {
@@ -43,7 +42,7 @@ export class UserController extends Controller {
     super(logger);
     this.logger.info('Register routes for UserController ...');
 
-    this.validateObjectIdMiddleware = new ValidateObjectIdMiddleware(['offerId']);
+    this.validateObjectIdMiddleware = new ValidateObjectIdMiddleware(['offerId', 'id']);
 
     this.addRoute({
       path: '/create',
@@ -90,7 +89,6 @@ export class UserController extends Controller {
       method: HttpMethod.Post,
       handler: this.uploadAvatar,
       middleware: [
-        new PrivateRouteMiddleware(),
         new UploadFileMiddleware(this.config.get('UPLOAD_DIRECTORY'), 'avatar'),
         this.validateObjectIdMiddleware,
         new DocumentExistsMiddleware(this.userService, 'User', 'id'),
@@ -130,7 +128,15 @@ export class UserController extends Controller {
 
   public async check({ tokenPayload: { id }}: Request, res: Response) {
     const result = await this.userService.findById(id);
-    this.success(res, fillDto(UserRdo, result));
+    if(result) {
+      this.success(res, fillDto(UserRdo, result));
+    } else {
+      throw new HttpError(
+        StatusCodes.NOT_FOUND,
+        `User with id «${id}» does not.`,
+        'UserController'
+      );
+    }
   }
 
   public async addFavouriteOffer({ body, tokenPayload: { id }}: AddUserFavouriteOfferRequest, res: Response) {
@@ -152,7 +158,7 @@ export class UserController extends Controller {
     this.success(res, fillDto(UserRdo, result));
   }
 
-  public async uploadAvatar({tokenPayload: { id }, file}: Request, res: Response): Promise<void> {
+  public async uploadAvatar({ file, params: { id } }: UploadUserAvatarRequest, res: Response): Promise<void> {
 
     if (file?.filename) {
       const result = await this.userService.uploadAvatar(id, file?.filename);

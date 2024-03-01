@@ -2,10 +2,13 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 
 import { Token } from './utils';
+import {ApplicationError, ApplicationErrorType} from './types/types';
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'http://localhost:4000';
 const REQUEST_TIMEOUT = 5000;
 
+const isValidationError = (data: unknown): data is ApplicationError =>
+  (data as ApplicationError)?.errorType === ApplicationErrorType.ValidationError || !!(data as ApplicationError)?.details;
 export const createAPI = (): AxiosInstance => {
   const api = axios.create({
     baseURL: BACKEND_URL,
@@ -28,7 +31,16 @@ export const createAPI = (): AxiosInstance => {
     (response) => response,
     (error: AxiosError) => {
       toast.dismiss();
-      toast.warn(error.response ? error.response.data.error : error.message);
+
+      if (isValidationError(error.response?.data)) {
+        error.response?.data?.details.forEach((i) => {
+          toast.warn(i.message);
+        });
+
+      } else {
+        toast.warn(error.response ? error.response.data.error : error.message);
+      }
+
 
       return Promise.reject(error);
     }

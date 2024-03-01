@@ -70,7 +70,6 @@ const OfferForm = <T extends Offer | NewOffer>({
     title,
     description,
     city,
-    previewImage,
     isPremium,
     type,
     bedrooms,
@@ -175,8 +174,6 @@ const OfferForm = <T extends Offer | NewOffer>({
           placeholder="Preview image"
           name={FormFieldName.previewImage}
           id="previewImage"
-          required
-          defaultValue={previewImage}
         />
       </div>
       <fieldset className="images-fieldset">
@@ -191,8 +188,6 @@ const OfferForm = <T extends Offer | NewOffer>({
               placeholder="Offer image"
               name={`${FormFieldName.image}-${index}`}
               id={`image-${index}`}
-              required
-              defaultValue={image}
             />
           </div>
         ))}

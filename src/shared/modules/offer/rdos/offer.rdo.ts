@@ -1,5 +1,5 @@
 import { Expose, Type } from 'class-transformer';
-import { Location, UserType } from '../../../types/index.js';
+import { User } from '../../../types/index.js';
 import { OfferLiteRdo } from './offer.lite.rdo.js';
 import { UserRdo } from '../../user/index.js';
 
@@ -22,10 +22,7 @@ export class OfferRdo extends OfferLiteRdo {
   @Expose()
   public facilities: string[];
 
-  @Expose()
-  public location: Location;
-
   @Expose({ name: 'userId'})
   @Type(() => UserRdo)
-  public author: UserType;
+  public author: User;
 }

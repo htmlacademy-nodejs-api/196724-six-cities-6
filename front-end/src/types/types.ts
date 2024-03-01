@@ -48,6 +48,15 @@ export type Offer = {
   maxAdults: number;
 };
 
+export type LightOffer = Omit<Offer,
+  | 'host'
+  | 'goods'
+  | 'images'
+  | 'maxAdults'
+  | 'bedrooms'
+  | 'description'
+>
+
 export type NewOffer = {
   title: string;
   description: string;
@@ -70,3 +79,23 @@ export type CommentAuth = NewComment &
 export type FavoriteAuth = Offer['id'];
 export type UserRegister = Omit<User, 'avatarUrl'> &
   Pick<UserAuth, 'password'> & { avatar?: File };
+
+export enum ApplicationErrorType {
+  ValidationError = 'VALIDATION_ERROR',
+  CommonError = 'COMMON_ERROR',
+  ServiceError = 'SERVICE_ERROR',
+  Authorisation = 'AUTHORIZATION',
+}
+
+export type ValidationErrorField = {
+  property?: string;
+  value?: string;
+  message: string;
+};
+
+export type ApplicationError = {
+  error: string;
+  errorType: ApplicationErrorType;
+  details: ValidationErrorField[]
+}
+

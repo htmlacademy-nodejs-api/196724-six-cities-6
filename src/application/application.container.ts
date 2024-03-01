@@ -12,6 +12,7 @@ import {
   ValidationExceptionFilter,
   AuthExceptionFilter
 } from '../shared/libs/exeption-filter/index.js';
+import {StoragePathTransformer} from '../shared/libs/transformer/index.js';
 
 export function createApplicationContainer() {
   const applicationContainer: Container = new Container();
@@ -24,5 +25,6 @@ export function createApplicationContainer() {
   applicationContainer.bind<IExceptionFilter>(Components.HttpExceptionFilter).to(HttpErrorExceptionFilter).inSingletonScope();
   applicationContainer.bind<IExceptionFilter>(Components.ValidationExceptionFilter).to(ValidationExceptionFilter).inSingletonScope();
   applicationContainer.bind<IExceptionFilter>(Components.AuthExceptionFilter).to(AuthExceptionFilter).inSingletonScope();
+  applicationContainer.bind<StoragePathTransformer>(Components.StoragePathTransformer).to(StoragePathTransformer).inSingletonScope();
   return applicationContainer;
 }

@@ -3,13 +3,14 @@ import FavoritesEmpty from '../../components/favorites-empty/favorites-empty';
 import Spinner from '../../components/spinner/spinner';
 import { useAppSelector } from '../../hooks';
 import { getFavoriteOffers, getIsFavoriteOffersLoading } from '../../store/site-data/selectors';
-import type { Offer } from '../../types/types';
+import type {LightOffer} from '../../types/types';
+import {useMemo} from 'react';
 
 const Favorites = (): JSX.Element => {
   const isFavoriteOffersLoading = useAppSelector(getIsFavoriteOffersLoading);
   const favoriteOffers = useAppSelector(getFavoriteOffers);
 
-  const groupedOffersByCity = favoriteOffers.reduce<{ [key: string ]: Offer[] }>((acc, curr) => {
+  const groupedOffersByCity = useMemo(() => favoriteOffers.reduce<{ [key: string ]: LightOffer[] }>((acc, curr) => {
     if (curr.isFavorite) {
       const city = curr.city.name;
 
@@ -21,7 +22,7 @@ const Favorites = (): JSX.Element => {
     }
 
     return acc;
-  }, {});
+  }, {}), [favoriteOffers]);
 
   if (isFavoriteOffersLoading) {
     return <Spinner />;

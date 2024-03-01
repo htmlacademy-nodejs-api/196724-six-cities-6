@@ -65,15 +65,6 @@ export class CommentController extends Controller {
 
   public async fetchByOfferId({ params: { id } } : GetOfferCommentsRequest, res: Response) {
     const result = await this.commentService.fetchByOfferId(id);
-
-    if (result.length) {
-      return this.success(res, fillDto(CommentRdo, result));
-    }
-
-    throw new HttpError(
-      StatusCodes.NO_CONTENT,
-      `Offer with id «${id}»  does not have any comments.`,
-      'CommentController'
-    );
+    return this.success(res, fillDto(CommentRdo, result));
   }
 }

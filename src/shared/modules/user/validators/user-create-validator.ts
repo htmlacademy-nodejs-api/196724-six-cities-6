@@ -7,6 +7,6 @@ export const userCreateValidator = Joi.object<CreateUserDto>({
   name: Joi.string().min(USER_NAME_MIN).max(USER_NAME_MAX).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(USER_PASSWORD_MIN).max(USER_PASSWORD_MAX).required(),
-  type: Joi.string().valid(UserType.PRO, UserType.BASIC).required(),
+  type: Joi.string().valid(UserType.PRO, UserType.REGULAR).required(),
   avatarUrl: Joi.string().uri().optional()
 });

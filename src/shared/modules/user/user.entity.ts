@@ -2,6 +2,7 @@ import { Collections, User, UserType } from '../../types/index.js';
 import { getModelForClass, prop, modelOptions } from '@typegoose/typegoose';
 import { getGeneratedSHA256 } from '../../utils/index.js';
 import { BaseDocument } from '../base-document.js';
+import {DefaultFiles} from '../../libs/transformer/index.js';
 
 @modelOptions({
   schemaOptions: {
@@ -29,13 +30,13 @@ export class UserEntity extends BaseDocument {
   @prop({ required: true })
   public password: string;
 
-  @prop({ required: true, default: UserType.BASIC })
+  @prop({ required: true, default: UserType.REGULAR })
   public type: UserType;
 
-  @prop({ required: false, default: undefined })
+  @prop({ required: false, default: DefaultFiles.Avatar })
   public avatarUrl?: string;
 
-  @prop({ type: () => [String], default: undefined })
+  @prop({ type: () => [String], default: [] })
   public favourites?: string[];
 
   public setPassword(salt: string) {

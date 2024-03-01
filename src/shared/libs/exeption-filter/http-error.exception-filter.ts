@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { StatusCodes } from 'http-status-codes';
 import { NextFunction, Request, Response } from 'express';
 import { IExceptionFilter} from './exeption-filter.interface.js';
-import { ApplicationError, Components } from '../../types/index.js';
+import { ApplicationErrorType, Components } from '../../types/index.js';
 import { ILogger } from '../logger/index.js';
 import { HttpError } from '../errors/index.js';
 import { createErrorObject } from '../../utils/index.js';
@@ -25,6 +25,6 @@ export class HttpErrorExceptionFilter implements IExceptionFilter {
 
     res
       .status(StatusCodes.BAD_REQUEST)
-      .json(createErrorObject(ApplicationError.CommonError, error.message));
+      .json(createErrorObject(ApplicationErrorType.CommonError, error.message));
   }
 }
