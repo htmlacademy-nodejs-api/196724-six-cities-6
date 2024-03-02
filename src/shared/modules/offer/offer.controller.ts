@@ -7,7 +7,7 @@ import { CreateOffersRequestType, GetOffersRequestType, PatchOffersRequestType }
 
 import { IOfferService } from './offer-service.interface.js';
 import { Request, Response } from 'express';
-import {fillDto, getRandomItem, getSlicedRandomArray, isNumber} from '../../utils/index.js';
+import {fillDto, isNumber} from '../../utils/index.js';
 
 import { OfferLiteRdo, OfferRdo } from './rdos/index.js';
 import { StatusCodes } from 'http-status-codes';
@@ -19,9 +19,8 @@ import {
   ValidateObjectIdMiddleware
 } from '../../libs/middleware/index.js';
 import { CreateOfferDto, UpdateOfferDto } from './dtos/index.js';
-import { createOfferValidator, OfferBaseConstraints, updateOfferValidator } from './validators/index.js';
+import { createOfferValidator, updateOfferValidator } from './validators/index.js';
 import { HttpError } from '../../libs/errors/index.js';
-import { OFFER_STATIC_URLS } from './offer.constants.js';
 import { OfferMessages } from './offer.messages.js';
 
 @injectable()
@@ -162,8 +161,6 @@ export class OfferController extends Controller {
     const result = await this.offerService.create({
       ...body,
       userId: id,
-      previewUrl: getRandomItem(OFFER_STATIC_URLS),
-      urls: getSlicedRandomArray(OFFER_STATIC_URLS, OfferBaseConstraints.UrlsMin)
     });
     return this.created(res, fillDto(OfferRdo, result));
   }

@@ -129,3 +129,16 @@ export const CityLocation: { [key in CityName]: Location } = {
     longitude: 6.776314,
   },
 };
+
+export const OFFER_STATIC_URLS = [
+  'amsterdam.jpg',
+  'amsterdam@2x.jpg',
+  'apartment-01.jpg',
+  'apartment-02.jpg',
+  'apartment-03.jpg',
+  'apartment-small-03.jpg',
+  'apartment-small-04.jpg',
+];
+
+export const MIN_OFFER_IMAGES = 6;
+

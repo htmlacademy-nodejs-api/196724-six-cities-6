@@ -13,4 +13,6 @@ export class CreateOfferDto {
   public facilities!: string[];
   public location!: LocationDto;
   public isPremium!: boolean;
+  public previewUrl!: string;
+  public urls!: string[];
 }

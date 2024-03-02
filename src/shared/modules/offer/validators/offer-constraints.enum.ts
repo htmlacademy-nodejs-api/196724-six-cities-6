@@ -22,7 +22,3 @@ export enum OfferGuestsConstraints {
   Min = 1,
   Max = 10
 }
-
-export enum OfferBaseConstraints {
-  UrlsMin = 6,
-}
