@@ -1,4 +1,4 @@
-import { injectable } from 'inversify';
+import {inject, injectable} from 'inversify';
 import { StatusCodes } from 'http-status-codes';
 import { RequestHandler, Response, Router } from 'express';
 import asyncHandler from 'express-async-handler';
@@ -6,6 +6,8 @@ import { IController } from './controller.interface.js';
 import { ILogger } from '../logger/index.js';
 import { Route } from './types/index.js';
 import { IMiddleware } from '../middleware/index.js';
+import {StoragePathTransformer} from '../transformer/index.js';
+import {Components} from '../../types/index.js';
 
 
 const DEFAULT_CONTENT_TYPE = 'application/json';
@@ -23,6 +25,9 @@ export abstract class Controller implements IController {
   get router() {
     return this._router;
   }
+
+  @inject(Components.StoragePathTransformer)
+  private storagePathTransformer: StoragePathTransformer;
 
   public addRoute(route: Route) {
     const wrapperAsyncHandler = asyncHandler(route.handler.bind(this));
@@ -43,7 +48,7 @@ export abstract class Controller implements IController {
   }
 
   public created<T>(res: Response, data: T): void {
-    this.send(res, StatusCodes.CREATED, data);
+    this.send(res, StatusCodes.CREATED, this.storagePathTransformer.execute(data as Record<string, unknown>));
   }
 
   public noContent<T>(res: Response, data: T): void {
@@ -51,6 +56,8 @@ export abstract class Controller implements IController {
   }
 
   public success<T>(res: Response, data: T): void {
-    this.send(res, StatusCodes.OK, data);
+    const modifiedData = Array.isArray(data) ?
+      data.map(this.storagePathTransformer.execute) : this.storagePathTransformer.execute(data as Record<string, unknown>);
+    this.send(res, StatusCodes.OK, modifiedData);
   }
 }

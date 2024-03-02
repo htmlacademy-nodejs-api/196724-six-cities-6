@@ -9,8 +9,8 @@ import {createAuthContainer} from './shared/modules/auth/index.js';
 
 const bootstrap = () => {
   const appContainer = Container.merge(
-    createApplicationContainer(),
     createUserContainer(),
+    createApplicationContainer(),
     createCommentContainer(),
     createOfferContainer(),
     createAuthContainer()

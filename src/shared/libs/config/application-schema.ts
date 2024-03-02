@@ -18,7 +18,7 @@ export const configApplicationSchema = convict<ApplicationSchema>({
     default: null
   },
   SALT: {
-    doc: 'Password hush.',
+    doc: 'Password hush secret.',
     format: String,
     env: 'SALT',
     default: null

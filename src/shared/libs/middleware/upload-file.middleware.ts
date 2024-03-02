@@ -3,8 +3,8 @@ import * as crypto from 'node:crypto';
 import { IMiddleware} from './middleware.interface.js';
 import { NextFunction, Request, Response } from 'express';
 import multer, { diskStorage } from 'multer';
-import { HttpError } from '../exeption-filter/index.js';
 import { StatusCodes } from 'http-status-codes';
+import { HttpError } from '../errors/index.js';
 
 export class UploadFileMiddleware implements IMiddleware {
   constructor(
@@ -34,6 +34,5 @@ export class UploadFileMiddleware implements IMiddleware {
       .single(this.fieldName);
 
     uploadSingleFileMiddleware(req, res, next);
-
   }
 }

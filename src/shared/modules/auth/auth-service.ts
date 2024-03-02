@@ -1,5 +1,5 @@
 import { IAuthService } from './auth-service.interface.js';
-import { inject, injectable } from 'inversify';
+import { inject, injectable, } from 'inversify';
 import { IUserService, LoginUserDto, UserEntity } from '../user/index.js';
 import { Components } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
@@ -7,7 +7,8 @@ import { ApplicationSchema, IConfig } from '../../libs/config/index.js';
 import * as crypto from 'node:crypto';
 import { JWT_ALGORITHM, TokenPayload } from './types/index.js';
 import { SignJWT } from 'jose';
-import { UserNotFoundException, UserPasswordIncorrectException } from './errors/index.js';
+import { UserNotFoundException, UserPasswordIncorrectException } from '../../libs/errors/index.js';
+import { getGeneratedSHA256 } from '../../utils/index.js';
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -17,7 +18,7 @@ export class AuthService implements IAuthService {
     @inject(Components.Config) private readonly config: IConfig<ApplicationSchema>,
   ) {}
 
-  public authenticate(user: UserEntity): Promise<string> {
+  public authenticate = (user: UserEntity): Promise<string> => {
     const jwtSecret: string = this.config.get('JWT_SECRET');
     const jwtExpiredTime: string = this.config.get('JWT_EXPIRED');
     const secretKey = crypto.createSecretKey(jwtSecret, 'utf-8');
@@ -31,22 +32,22 @@ export class AuthService implements IAuthService {
       .setIssuedAt()
       .setExpirationTime(jwtExpiredTime)
       .sign(secretKey);
-  }
+  };
 
-  public async verify(dto: LoginUserDto): Promise<UserEntity | null> {
+  public verify = async (dto: LoginUserDto): Promise<UserEntity | null> => {
     const user = await this.userService.findByEmail(dto.email);
     if (!user) {
       this.logger.warn(`User with ${dto.email} not found!`);
       throw new UserNotFoundException();
     }
 
-    const isVerified: boolean = user.verifyPassword(dto.password, this.config.get('SALT'));
+    const isVerified: boolean = user.password === getGeneratedSHA256(dto.password, this.config.get('SALT'));
     if (!isVerified) {
       this.logger.warn(`Incorrect password for ${dto.email}!`);
       throw new UserPasswordIncorrectException();
     }
 
     return user;
-  }
+  };
 
 }

@@ -15,6 +15,7 @@ import {
 } from './offer-service.pipelines.js';
 import { CommentEntity } from '../comment/index.js';
 import { UserEntity } from '../user/index.js';
+import {OfferMessages} from './offer.messages.js';
 
 
 @injectable()
@@ -28,14 +29,18 @@ export class OfferService implements IOfferService {
 
   public async create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>> {
     const result = await this.offerModel.create(dto);
-    this.logger.info(`New offer created: ${result.name}`);
+    this.logger.info(OfferMessages.new(result.name));
     return result;
   }
 
   public async update(id: string, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null> {
     const result = await this.offerModel.findByIdAndUpdate(id, dto, {new: true})
       .populate(['userId']).exec();
-    this.logger.info(`${dto.name} offer updated.`);
+    if (result) {
+      this.logger.info(OfferMessages.updated(result.name));
+    } else {
+      this.logger.info(OfferMessages.notFound(id));
+    }
     return result;
   }
 
@@ -43,7 +48,11 @@ export class OfferService implements IOfferService {
     const result = await this.offerModel.findByIdAndDelete(id).exec();
     await this.commentModel.deleteMany({ offerId: id }).exec();
     await this.userModel.updateMany(undefined, { $unset: { favourites: id } }).exec();
-    this.logger.info(`${result?.name} offer deleted.`);
+    if (result) {
+      this.logger.info(OfferMessages.deleted(result.name));
+    } else {
+      this.logger.info(OfferMessages.notFound(id));
+    }
     return result;
   }
 

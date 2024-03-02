@@ -10,6 +10,23 @@ npm install
 
 Команда запустит процесс установки зависимостей проекта из **npm**.
 
+### Environments (example)
+```
+PORT=4000 - Local connection port.
+HOST=localhost - Local host name.
+SALT=secret - Password hush secret.
+DB_HOST=127.0.0.1 - Database host.
+DB_PORT=27012 - Database port.
+DB_USER=admin - Database user name.
+DB_PASSWORD=test - Database user password.
+DB_NAME=six-cities - Database name.
+UPLOAD_DIRECTORY=/Users/il421/WebstormProjects/196724-six-cities-6/upload - Directory for upload files'
+STATIC_DIRECTORY=/Users/il421/WebstormProjects/196724-six-cities-6/static - Directory for static files
+JWT_SECRET=secret - JWT secret
+JWT_EXPIRED=2d - JWT expired time
+
+```
+
 ### Сценарии
 
 В `package.json` предопределено несколько сценариев.
@@ -59,18 +76,40 @@ npm run ts -- <Путь к модулю с ts-кодом>
 Пакет `ts-node` позволяет выполнить TS-код в Node.js без предварительной компиляции. Используется только на этапе разработки.
 
 #### Запустить проект
+##### Steps:
+1. CLI
+   - Run local JSON server `npm run run-json-server`.
+   - Build and run Mongo DB from docker compose file `npm run docker-mongo`.
+2. REST Application
+   - Build and run Mongo DB from docker compose file `npm run docker-mongo`.
+   - Build and run Application  `npm run start`, in development mode `npm run start:dev`.
+
+##### Fill scripts list:
+```bash
+npm run start:dev
+```
+Running project in development mode.
 
 ```bash
 npm start
 ```
 В процессе запуска проекта будет выполнен процесс «Сборки проекта» и запуска результирующего кода.
 
-#### Run JSON server
-It allows running a local JSON server with mocked data located in `mokes/mock-server-data.json`.
+```bash
+npm run docker-mongo
+```
+Running Mongo DB in Docker container.
 
 ```bash
-npm run-json-server
+npm run run-json-server
 ```
+It allows running a local JSON server with mocked data located in `mokes/mock-server-data.json`.
+
+#### CLI commands
+1. `npm run cli-help` - shows instruction in terminal.
+2. `npm run cli-version` - shows the current project version.
+3. `npm run cli-generate` - generate random offers data and write TSV file to /mocks.
+4. ` npm run cli-import` - imports data from generated TSV file into MongoDB.
 ## Структура проекта
 
 ### Директория `src`

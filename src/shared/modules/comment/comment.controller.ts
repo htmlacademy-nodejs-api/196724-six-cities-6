@@ -6,9 +6,8 @@ import { Response } from 'express';
 import { fillDto } from '../../utils/index.js';
 import { CommentRdo } from './rdos/index.js';
 import { GetOfferCommentsRequest } from './types/index.js';
-import { HttpError } from '../../libs/exeption-filter/index.js';
 import { StatusCodes } from 'http-status-codes';
-import { IOfferService } from '../offer/index.js';
+import {IOfferService, OfferMessages} from '../offer/index.js';
 import { ICommentService } from './comment-service.interface.js';
 import { CreateCommentRequest } from './types/create-comment-request.type.js';
 import {
@@ -18,6 +17,7 @@ import {
 } from '../../libs/middleware/index.js';
 import { CreateCommentDto } from './dtos/index.js';
 import { createCommentValidator } from './validators/index.js';
+import { HttpError } from '../../libs/errors/index.js';
 
 @injectable()
 export class CommentController extends Controller {
@@ -58,22 +58,13 @@ export class CommentController extends Controller {
 
     throw new HttpError(
       StatusCodes.BAD_REQUEST,
-      `Offer with id «${body.offerId}» does not exist.`,
+      OfferMessages.notFound(body.offerId),
       'CommentController'
     );
   }
 
   public async fetchByOfferId({ params: { id } } : GetOfferCommentsRequest, res: Response) {
     const result = await this.commentService.fetchByOfferId(id);
-
-    if (result.length) {
-      return this.success(res, fillDto(CommentRdo, result));
-    }
-
-    throw new HttpError(
-      StatusCodes.NO_CONTENT,
-      `Offer with id «${id}»  does not have any comments.`,
-      'CommentController'
-    );
+    return this.success(res, fillDto(CommentRdo, result));
   }
 }

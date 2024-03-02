@@ -7,6 +7,7 @@ import { CreateCommentDto } from './dtos/index.js';
 import { CommentEntity } from './comment.entity.js';
 import { MAX_RETRIEVE_COMMENTS } from './comment-service.constants.js';
 import mongoose from 'mongoose';
+import {CommentMessages} from './comment.messages.js';
 
 @injectable()
 export class CommentService implements ICommentService {
@@ -18,7 +19,7 @@ export class CommentService implements ICommentService {
   public async create(dto: CreateCommentDto): Promise<DocumentType<CommentEntity>> {
     const result: DocumentType<CommentEntity> = await this.commentModel.create(dto);
     await result.populate('userId');
-    this.logger.info('New comment created!');
+    this.logger.info(CommentMessages.newComment);
     return result;
   }
 

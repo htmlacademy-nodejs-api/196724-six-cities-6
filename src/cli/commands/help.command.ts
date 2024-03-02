@@ -20,10 +20,10 @@ export class HelpCommand implements Command {
       ${Chalk.green('Программа для подготовки данных для REST API сервера.')}
       ${Chalk.blue('Пример:')} cli.js --<command> [--arguments]
       ${Chalk.blue('Команды:')}
-        --version:                                                 ✓ выводит номер версии
-        --help:                                                    ✓ печатает этот текст
-        --import <path> <user> <password> <host> <port> <dbName>:  ✓ импортирует данные из TSV
-        --generate <count> <path> <url>:                           ✓ generate random offers data and write TSV file to /mocks
+        --version:                                                 ✓ shows the current project version
+        --help:                                                    ✓ shows instruction in terminal
+        --import <path> <user> <password> <host> <port> <dbName>:  ✓ imports data from generated TSV file into MongoDB
+        --generate <count> <path> <url>:                           ✓ generates random offers data and write TSV file to /mocks
     `);
   }
 }

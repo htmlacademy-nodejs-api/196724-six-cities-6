@@ -1,3 +1,4 @@
+
 export const Components = {
   CliApplication: Symbol.for('CliApplication'),
   Application: Symbol.for('Application'),
@@ -16,8 +17,12 @@ export const Components = {
   CommentService: Symbol.for('CommentService'),
   CommentModel: Symbol.for('CommentModel'),
   OfferController: Symbol.for('OfferController'),
-  ExceptionFilter: Symbol.for('ExceptionFilter'),
+  AppExceptionFilter: Symbol.for('AppExceptionFilter'),
   UserController: Symbol.for('UserController'),
   CommentController: Symbol.for('CommentController'),
   AuthService: Symbol.for('AuthService'),
+  HttpExceptionFilter: Symbol.for('HttpExceptionFilter'),
+  ValidationExceptionFilter: Symbol.for('ValidationExceptionFilter'),
+  AuthExceptionFilter: Symbol.for('AuthExceptionFilter'),
+  StoragePathTransformer: Symbol.for('StoragePathTransformer'),
 } as const;

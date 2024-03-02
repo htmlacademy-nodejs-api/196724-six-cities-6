@@ -1,8 +1,8 @@
 import { IMiddleware } from './middleware.interface.js';
 import { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
-import { HttpError } from '../exeption-filter/index.js';
 import { StatusCodes } from 'http-status-codes';
+import { HttpError } from '../errors/index.js';
 
 export class ValidateObjectIdMiddleware implements IMiddleware {
   constructor(

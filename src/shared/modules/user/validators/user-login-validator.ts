@@ -1,8 +1,8 @@
 import Joi from 'joi';
 import { CreateUserDto } from '../dtos/index.js';
-import { USER_PASSWORD_MIN, USER_PASSWORD_MAX } from './user-constraints.constants.js';
+import { UserPasswordConstraints } from './user-constraints.enum.js';
 
 export const userLoginValidator = Joi.object<CreateUserDto>({
-  password: Joi.string().min(USER_PASSWORD_MIN).max(USER_PASSWORD_MAX).required(),
+  password: Joi.string().min(UserPasswordConstraints.Min).max(UserPasswordConstraints.Max).required(),
   email: Joi.string().email(),
 }).options({ presence: 'required' });

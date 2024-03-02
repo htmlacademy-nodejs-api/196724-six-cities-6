@@ -1,4 +1,5 @@
 import { Expose } from 'class-transformer';
+import {Location} from '../../../types/index.js';
 
 export class OfferLiteRdo {
   @Expose()
@@ -24,6 +25,9 @@ export class OfferLiteRdo {
 
   @Expose()
   public city: string;
+
+  @Expose()
+  public location: Location;
 
   @Expose()
   public previewUrl: string;
