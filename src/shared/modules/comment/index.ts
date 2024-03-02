@@ -6,3 +6,4 @@ export * from './comment-service.js';
 export * from './comment-service.interface.js';
 export * from './comment.container.js';
 export * from './comment.controller.js';
+export * from './comment.messages.js';

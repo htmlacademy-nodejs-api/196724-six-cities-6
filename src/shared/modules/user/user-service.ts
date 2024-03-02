@@ -4,10 +4,11 @@ import { IUserService} from './user-service.interface.js';
 import { inject, injectable } from 'inversify';
 import { Components } from '../../types/index.js';
 import { ILogger} from '../../libs/logger/index.js';
-import { CreateUserDto, LoginUserDto } from './dtos/index.js';
+import { CreateUserDto } from './dtos/index.js';
 import { ApplicationSchema, IConfig } from '../../libs/config/index.js';
-import { getGeneratedSHA256 } from '../../utils/index.js';
 import mongoose from 'mongoose';
+import { getGeneratedSHA256 } from '../../utils/index.js';
+import {UserMessages} from './user.messages.js';
 
 @injectable()
 export class UserService implements IUserService {
@@ -32,14 +33,16 @@ export class UserService implements IUserService {
   public async create(dto: CreateUserDto): Promise<DocumentType<UserEntity>> {
     const user = new UserEntity(dto);
 
-    if (this.salt && this.host && this.port) {
-      user.setPassword(this.salt);
+    if (this.host && this.port && this.salt) {
+      const password = getGeneratedSHA256(dto.password, this.salt);
+
+      user.setPassword(password);
       const result = await this.userModel.create(user);
       this.logger.info(`New user created: ${user.email}`);
       return result;
     }
 
-    throw Error('SALT, HOST, or PORT has not been provided for password hashing.');
+    throw Error(UserMessages.config);
   }
 
   public async uploadAvatar(id: string, fileName: string): Promise<DocumentType<UserEntity> | null> {
@@ -49,8 +52,7 @@ export class UserService implements IUserService {
       return result;
     }
 
-    throw Error('SALT, HOST, or POrt has not been provided for password hashing.');
-
+    throw Error(UserMessages.config);
   }
 
   public findById(id: string): Promise<DocumentType<UserEntity> | null> {
@@ -58,7 +60,7 @@ export class UserService implements IUserService {
     if (user) {
       return user;
     }
-    throw Error(`User with id: ${id} has not been found!`);
+    throw Error(UserMessages.notFound(id));
   }
 
   public async findByEmail(email: string): Promise<DocumentType<UserEntity> | null> {
@@ -66,22 +68,7 @@ export class UserService implements IUserService {
     if (user) {
       return user;
     }
-    throw Error(`User with id: ${email} has not been found!`);
-  }
-
-  // @TODO just a placeholder method
-  public async login(dto: LoginUserDto): Promise<DocumentType<UserEntity> | null> {
-    if(this.salt) {
-      const password = getGeneratedSHA256(dto.password, this.salt);
-      return this.userModel.findOne({ email: dto.email, password });
-
-    }
-    throw Error('SALT not found in application config');
-  }
-
-  // @TODO just a placeholder method
-  public async check(): Promise<DocumentType<UserEntity> | null>{
-    return Promise.resolve(null);
+    throw Error(UserMessages.notFound(email));
   }
 
   public addFavouriteOffer(id: string, offerId: string): Promise<DocumentType<UserEntity> | null> {

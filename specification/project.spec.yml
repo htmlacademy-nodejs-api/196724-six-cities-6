@@ -140,6 +140,13 @@ paths:
             type: string
           required: true
           description: User id.
+      requestBody:
+        description: Form data.
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserAvatar'
+        required: true
       responses:
         "200":
           description: A user avatar uploaded.
@@ -151,7 +158,7 @@ paths:
       tags:
         - OFFERS
       summary: A new offer.
-      description: Allows adding a new offers based on request body data.
+      description: Allows adding a new offers.
       requestBody:
         description: A new offer data.
         content:
@@ -173,7 +180,7 @@ paths:
       tags:
         - OFFERS
       summary: An offer update.
-      description: Allows updating an existing offer based on request body data.
+      description: Allows updating an existing offer.
       parameters:
         - in: path
           name: id
@@ -345,7 +352,7 @@ paths:
       tags:
         - COMMENTS
       summary: A new offer comment.
-      description: Allows adding a new comment for an offer based on request body data.
+      description: Allows adding a new comment for an offer.
       requestBody:
         description: A new comment data.
         content:
@@ -425,6 +432,16 @@ components:
       properties:
         offerId:
           type: string
+
+    UserAvatar:
+      type: object
+      properties:
+        name:
+          type: string
+          example: avatar
+        filename:
+          type: string
+          example: amsterdam.jpg
 
     # Offers related
     CreateOfferRequest:
@@ -533,7 +550,7 @@ components:
           type: string
         rating:
           type: number
-          example: 1 to 5
+          example: 1
         publishDate:
           type: string
           example: 2020-07-10

@@ -1,6 +1,6 @@
-import {LocationDto, OfferDto, OfferLiteDto} from '../dtos/index.js';
-import {Comment, LightOffer, Location, Offer, Type} from '../../types/types.js';
-import {CommentDto} from '../dtos/commments/index.js';
+import { LocationDto, OfferDto, OfferLiteDto } from '../dtos/index.js';
+import { Comment, LightOffer, Location, Offer, Type } from '../../types/types.js';
+import { CommentDto } from '../dtos/commments/index.js';
 
 const locationToClient = (dto: LocationDto): Location => ({latitude: dto.lat, longitude: dto.long});
 export const lightOfferToClient = (dto: OfferLiteDto): LightOffer => ({

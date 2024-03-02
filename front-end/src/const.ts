@@ -1,4 +1,4 @@
-import {Offer, Location, CityName, SortName, type LightOffer} from './types/types';
+import { Location, CityName, SortName, type LightOffer} from './types/types';
 
 export const CITIES = [
   'Paris',
@@ -73,7 +73,7 @@ export enum Sorting {
 
 export enum UserType {
   Pro = 'pro',
-  Regular = 'regular'
+  Basic = 'basic'
 }
 
 export enum StoreSlice {

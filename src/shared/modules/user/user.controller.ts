@@ -10,7 +10,7 @@ import {inject, injectable} from 'inversify';
 import {Components} from '../../types/index.js';
 import {ILogger} from '../../libs/logger/index.js';
 import {IUserService} from './user-service.interface.js';
-import {IOfferService} from '../offer/index.js';
+import {IOfferService, OfferMessages} from '../offer/index.js';
 import {IAuthService} from '../auth/index.js';
 import {ApplicationSchema, IConfig} from '../../libs/config/index.js';
 import {AddUserFavouriteOfferDto, CreateUserDto, LoginUserDto} from './dtos/index.js';
@@ -27,6 +27,7 @@ import {fillDto} from '../../utils/index.js';
 import {LoginUserRdo, UserRdo} from './rdos/index.js';
 import {UserEntity} from './user.entity.js';
 import {HttpError} from '../../libs/errors/index.js';
+import {UserMessages} from './user.messages.js';
 
 @injectable()
 export class UserController extends Controller {
@@ -102,7 +103,7 @@ export class UserController extends Controller {
     if (existsUser) {
       throw new HttpError(
         StatusCodes.CONFLICT,
-        `User with email «${body.email}» exists.`,
+        UserMessages.exists(body.email),
         'UserController'
       );
     }
@@ -120,7 +121,7 @@ export class UserController extends Controller {
     } else {
       throw new HttpError(
         StatusCodes.NOT_FOUND,
-        `User with email «${body.email}».`,
+        UserMessages.notFound(body.email),
         'UserController'
       );
     }
@@ -133,7 +134,7 @@ export class UserController extends Controller {
     } else {
       throw new HttpError(
         StatusCodes.NOT_FOUND,
-        `User with id «${id}» does not.`,
+        UserMessages.notFound(id),
         'UserController'
       );
     }
@@ -147,7 +148,7 @@ export class UserController extends Controller {
     } else {
       throw new HttpError(
         StatusCodes.BAD_REQUEST,
-        `Offer with id «${body.offerId}» does not exists and can not be add as a user favourite one.`,
+        OfferMessages.notFound(body.offerId),
         'UserController'
       );
     }
@@ -167,7 +168,7 @@ export class UserController extends Controller {
 
     throw new HttpError(
       StatusCodes.BAD_REQUEST,
-      `Not able to read user id: ${id}.`,
+      UserMessages.notFound(id),
       'UserController'
     );
   }

@@ -86,3 +86,103 @@ npm run eject
 Выполнение данной команды, `react-scripts` скопирует все конфигурационные файлы и скрипты в корень проекта. Данный процесс позволяет получить полный контроль над конфигурацией проекта.
 
 Не используйте данную команду, если не уверены как именно она работает или к какому результату приведёт ее выполнение.
+
+### API resources
+#### User
+1. POST `users/create` - a new user sign-up.
+```
+{
+  "name": "Test,",
+  "email": "test@test.com,",
+  "password": "123456"
+}
+```
+2. POST `users/login` - a user sign-in.
+```
+{
+  "email": "test@test.com,",
+  "password": "123456"
+}
+```
+3. GET `users/check` - a user authorisation check. 
+4. POST `users/offers/favourite/add` - adding an offer from a user favourite list.
+```
+{
+  "offerId": "string"
+}
+```
+5. DELETE `users/offers/favourite/{offerId}/remove` - deleting an offer from a user favourite list.
+```
+{
+  "offerId": "string"
+}
+```
+6. POST `users/{id}/avatar` - a user avatar uploading.
+```
+form-data; name="avatar"; filename="file-name"
+```
+#### Offer
+1. POST `offers/create` - a new offer.
+```
+{
+  "name": "Good hotel",
+  "description": "Very good hotel",
+  "postDate": "2020-07-10",
+  "city": "Auckland",
+  "price": 2000,
+  "previewUrl": "https://test.com/1",
+  "urls": [
+    "string"
+  ],
+  "type": "hotel",
+  "bedrooms": 2,
+  "guests": 1,
+  "facilities": [
+    "string"
+  ],
+  "location": {
+    "long": -100.4,
+    "lat": 100.56
+  }
+}
+```
+2. PATCH `offers/update/{id}` - allows updating an existing offer.
+```
+{
+  "name": "Good hotel",
+  "description": "Very good hotel",
+  "postDate": "2020-07-10",
+  "city": "Auckland",
+  "price": 2000,
+  "previewUrl": "https://test.com/1",
+  "urls": [
+    "string"
+  ],
+  "type": "hotel",
+  "bedrooms": 2,
+  "guests": 1,
+  "facilities": [
+    "string"
+  ],
+  "location": {
+    "long": -100.4,
+    "lat": 100.56
+  }
+}
+```
+3. DELETE `offers/delete/{id}` - allows deleting an existing offer.
+4. GET `offers?limit=` - retrieve offers list. Default limit - 60 offers.
+5. GET `offers/{id}` - retrieve individual full offer by id.
+6. GET `offers/premium?city=` - retrieve three premium offers queried by city.
+7. GET `offers/favourite` - retrieve favourites offers.
+
+#### Comment
+1. GET `comments/offer/{id}` - retrieve an offer comments list.
+2. POST `comments/offer/create` - allows adding a new comment for an offer.
+```
+{
+  "text": "string",
+  "rating": 1,
+  "publishDate": "2020-07-10"
+}
+```

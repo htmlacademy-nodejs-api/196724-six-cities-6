@@ -2,9 +2,9 @@ import { inject, injectable } from 'inversify';
 import { Components, Offer, Storage, User } from '../../types/index.js';
 import { ILogger } from '../logger/index.js';
 import { DefaultFiles } from './default-files.enums.js';
-import { AUTHOR_PROPERTIES, OFFER_TRANSFORM_PROPERTIES, USER_TRANSFORM_PROPERTIES } from './storage-path.constants.js';
 import { getStorageUrl } from '../../utils/index.js';
 import { ApplicationSchema, IConfig } from '../config/index.js';
+import { getTransformPaths } from './utils/index.js';
 
 @injectable()
 export class StoragePathTransformer {
@@ -15,12 +15,7 @@ export class StoragePathTransformer {
     this.logger.info('StoragePathTransformer created!');
   }
 
-  private isUserAvatarKey = (key: string) => USER_TRANSFORM_PROPERTIES.includes(key);
-
-  private isOfferUrl = (key: string) => OFFER_TRANSFORM_PROPERTIES.includes(key);
-
   private isDefaultProperty = (value: string) => value === DefaultFiles.Avatar;
-  private isAuthorKey = (key: string) => AUTHOR_PROPERTIES === key;
 
   private get host() {
     return this.config.get('HOST');
@@ -49,21 +44,5 @@ export class StoragePathTransformer {
     }
   };
 
-  public execute = (data: Record<string, unknown>): Record<string, unknown> => Object.keys(data).reduce((acc, key) => {
-    if (this.isAuthorKey(key)) {
-      const author = data[key] as Record<string, unknown>;
-      return {...acc, author: this.execute(author)};
-    }
-
-    if (this.isUserAvatarKey(key)) {
-      return {...acc, ...{...data, ...this.transformAvatarUrl(data[key] as string)}};
-    }
-
-    if (this.isOfferUrl(key)) {
-      return {...acc, ...this.transformOfferUrl(data[key] as string | string[])};
-    }
-
-
-    return acc;
-  }, data);
+  public execute = (data: Record<string, unknown>): Record<string, unknown> => getTransformPaths(data, this.transformAvatarUrl, this.transformOfferUrl);
 }

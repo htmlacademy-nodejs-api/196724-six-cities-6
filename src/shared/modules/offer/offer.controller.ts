@@ -19,9 +19,10 @@ import {
   ValidateObjectIdMiddleware
 } from '../../libs/middleware/index.js';
 import { CreateOfferDto, UpdateOfferDto } from './dtos/index.js';
-import {createOfferValidator, MIN_URLS, updateOfferValidator} from './validators/index.js';
-import {HttpError} from '../../libs/errors/index.js';
-import {OFFER_STATIC_URLS} from './offer.constants.js';
+import { createOfferValidator, OfferBaseConstraints, updateOfferValidator } from './validators/index.js';
+import { HttpError } from '../../libs/errors/index.js';
+import { OFFER_STATIC_URLS } from './offer.constants.js';
+import { OfferMessages } from './offer.messages.js';
 
 @injectable()
 export class OfferController extends Controller {
@@ -102,7 +103,7 @@ export class OfferController extends Controller {
 
     throw new HttpError(
       StatusCodes.BAD_REQUEST,
-      `Limit ${limit} is not a number.`,
+      OfferMessages.invalidLimit(limit),
       'OfferController'
     );
   }
@@ -115,7 +116,7 @@ export class OfferController extends Controller {
 
     throw new HttpError(
       StatusCodes.NOT_FOUND,
-      `Offer with id «${id}» not found.`,
+      OfferMessages.notFound(id),
       'OfferController'
     );
   }
@@ -130,7 +131,7 @@ export class OfferController extends Controller {
     }
     throw new HttpError(
       StatusCodes.BAD_REQUEST,
-      `Not able to parse city: ${city}.`,
+      OfferMessages.invalidCity(city),
       'OfferController'
     );
   }
@@ -152,7 +153,7 @@ export class OfferController extends Controller {
 
     throw new HttpError(
       StatusCodes.BAD_REQUEST,
-      `Not able to read offer id: ${id}.`,
+      OfferMessages.notFound(id),
       'OfferController'
     );
   }
@@ -162,7 +163,7 @@ export class OfferController extends Controller {
       ...body,
       userId: id,
       previewUrl: getRandomItem(OFFER_STATIC_URLS),
-      urls: getSlicedRandomArray(OFFER_STATIC_URLS, MIN_URLS)
+      urls: getSlicedRandomArray(OFFER_STATIC_URLS, OfferBaseConstraints.UrlsMin)
     });
     return this.created(res, fillDto(OfferRdo, result));
   }
@@ -175,7 +176,7 @@ export class OfferController extends Controller {
 
     throw new HttpError(
       StatusCodes.BAD_REQUEST,
-      `Not able to read offer id: ${id}.`,
+      OfferMessages.notFound(id),
       'OfferController'
     );
   }

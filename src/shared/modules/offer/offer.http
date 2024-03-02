@@ -29,20 +29,12 @@ Authorization: Bearer
   "isPremium": true,
   "postDate": "2024-10-07",
   "city": "Paris",
-  "previewUrl": "https://picsum.photos/200/300/?blur",
   "rating": 0,
   "commentsCount": 0,
   "description": "Vela is located in beautiful Monteverde, famous for its rare and gorgeous cloud forest and friendly community.",
   "bedrooms": 2,
   "guests": 8,
-  "urls": [
-    "https://picsum.photos/200/300/?blur",
-    "https://picsum.photos/200",
-    "https://picsum.photos/200/300?grayscale",
-    "https://picsum.photos/id/237/200/300",
-    "https://picsum.photos/200/300.jpg",
-    "https://picsum.photos/seed/picsum/200/300"
-  ],
+  "urls": [],
   "facilities": [
     "Breakfast",
     "Fridge"
@@ -54,7 +46,7 @@ Authorization: Bearer
 }
 
 ### Updating an existing offer
-PATCH http://localhost:4000/offers/patch/65caa630ae538f90a64b3c9d
+PATCH http://localhost:4000/offers/update/65caa630ae538f90a64b3c9d
 Content-Type: application/json
 Authorization: Bearer
 
