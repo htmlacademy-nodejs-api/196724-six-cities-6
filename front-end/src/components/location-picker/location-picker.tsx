@@ -3,7 +3,7 @@ import { useRef, useEffect } from 'react';
 
 import type { City, Location } from '../../types/types';
 
-import { URL_MARKER_DEFAULT, ZOOM } from '../../const';
+import { UrlMaker, ZOOM } from '../../const';
 import useMap from '../../hooks/useMap';
 
 type LocationPickerProps = {
@@ -13,7 +13,7 @@ type LocationPickerProps = {
 };
 
 const customIcon = new Icon({
-  iconUrl: URL_MARKER_DEFAULT,
+  iconUrl: UrlMaker.default,
   iconSize: [40, 40],
   iconAnchor: [20, 40],
 });

@@ -1,7 +1,14 @@
 import Joi from 'joi';
 import { CreateOfferDto } from '../dtos/index.js';
 import { City, Facility, PropertyType } from '../../../types/index.js';
-import { OfferBedroomsConstraints, OfferDescConstraints, OfferGuestsConstraints, OfferNameConstraints, OfferPriceConstraints } from './offer-constraints.enum.js';
+import {
+  OfferBedroomsConstraints,
+  OfferDescConstraints,
+  OfferFacilitiesConstraints,
+  OfferGuestsConstraints,
+  OfferNameConstraints,
+  OfferPriceConstraints
+} from './offer-constraints.enum.js';
 
 export const baseOfferValidator = Joi.object<CreateOfferDto>({
   name: Joi.string().min(OfferNameConstraints.Min).max(OfferNameConstraints.Max),
@@ -12,7 +19,7 @@ export const baseOfferValidator = Joi.object<CreateOfferDto>({
   type: Joi.string().valid(...Object.keys(PropertyType)),
   bedrooms: Joi.number().integer().min(OfferBedroomsConstraints.Min).max(OfferBedroomsConstraints.Max),
   guests: Joi.number().integer().min(OfferGuestsConstraints.Min).max(OfferGuestsConstraints.Max),
-  facilities: Joi.array().items(Joi.string().valid(...Object.values(Facility))).unique(),
+  facilities: Joi.array().items(Joi.string().valid(...Object.values(Facility))).unique().min(OfferFacilitiesConstraints.Min),
   location: Joi.object({
     long: Joi.number(),
     lat: Joi.number()
