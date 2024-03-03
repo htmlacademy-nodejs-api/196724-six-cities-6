@@ -22,3 +22,8 @@ export enum OfferGuestsConstraints {
   Min = 1,
   Max = 10
 }
+
+export enum OfferFacilitiesConstraints {
+  Min = 1,
+}
+

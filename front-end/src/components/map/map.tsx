@@ -6,8 +6,7 @@ import type { City, Location } from '../../types/types';
 import useMap from '../../hooks/useMap';
 import {
   CityLocation,
-  URL_MARKER_CURRENT,
-  URL_MARKER_DEFAULT,
+  UrlMaker,
   ZOOM
 } from '../../const';
 
@@ -21,13 +20,13 @@ type MapProps = {
 };
 
 const defaultCustomIcon = new Icon({
-  iconUrl: URL_MARKER_DEFAULT,
+  iconUrl: UrlMaker.default,
   iconSize: [40, 40],
   iconAnchor: [20, 40],
 });
 
 const currentCustomIcon = new Icon({
-  iconUrl: URL_MARKER_CURRENT,
+  iconUrl: UrlMaker.current,
   iconSize: [40, 40],
   iconAnchor: [20, 40],
 });

@@ -6,16 +6,18 @@ import {
   getRandomNumber,
   getSlicedRandomArray
 } from '../../utils/index.js';
+import {
+  OfferBedroomsConstraints,
+  OfferPriceConstraints,
+  OfferGuestsConstraints,
+  OfferFacilitiesConstraints
+} from '../../modules/offer/validators/index.js';
 
-const MIN_PRICE = 100;
-const MAX_PRICE = 100000;
-const MIN_BEDROOMS = 1;
-const MAX_BEDROOMS = 8;
-const MIN_GUESTS = 1;
-const MAX_GUESTS = 10;
-const MIN_FACILITIES = 1;
-const MIN_LONG_LAT = -180;
-const MAX_LONG_LAT = 180;
+
+enum LongitudeConstraints {
+  min = -180,
+  max = 180
+}
 const LONG_LAT_FRACTION_DIGITS = 3;
 
 export class TsvOfferGenerator implements OfferGenerator {
@@ -25,21 +27,21 @@ export class TsvOfferGenerator implements OfferGenerator {
     const allPropertyTypes: string[] = Array.from(Object.values(PropertyType));
     const allCities: string[] = Array.from(Object.values(City));
     const allFacilities: string[] = Array.from(Object.values(Facility));
-    const maxFacilities = getRandomNumber(MIN_FACILITIES, allFacilities.length - 1);
+    const maxFacilities = getRandomNumber(OfferFacilitiesConstraints.Min, allFacilities.length - 1);
     const name = getRandomItem(this.offersData.names);
     const description = getRandomItem(this.offersData.descriptions);
     const postData = getRandomIsoDate();
     const city = getRandomItem(allCities);
-    const price = getRandomNumber(MIN_PRICE, MAX_PRICE);
+    const price = getRandomNumber(OfferPriceConstraints.Min, OfferPriceConstraints.Max);
     const previewUrl = getRandomItem(this.offersData.urls);
     const urls = getSlicedRandomArray(this.offersData.urls).join(',');
     const isPremium = getRandomNumber(0, 1);
     const type = getRandomItem(allPropertyTypes);
-    const bedrooms = getRandomNumber(MIN_BEDROOMS, MAX_BEDROOMS);
-    const guests = getRandomNumber(MIN_GUESTS, MAX_GUESTS);
+    const bedrooms = getRandomNumber(OfferBedroomsConstraints.Min, OfferBedroomsConstraints.Max);
+    const guests = getRandomNumber(OfferGuestsConstraints.Min, OfferGuestsConstraints.Max);
     const facilities = getSlicedRandomArray(allFacilities, maxFacilities).join(',');
     const userId = getRandomItem(this.offersData.userIds);
-    const location = `${getRandomNumber(MIN_LONG_LAT, MAX_LONG_LAT, true).toFixed(LONG_LAT_FRACTION_DIGITS)},${getRandomNumber(MIN_LONG_LAT, MAX_LONG_LAT, true).toFixed(LONG_LAT_FRACTION_DIGITS)}`;
+    const location = `${getRandomNumber(LongitudeConstraints.min, LongitudeConstraints.max, true).toFixed(LONG_LAT_FRACTION_DIGITS)},${getRandomNumber(LongitudeConstraints.min, LongitudeConstraints.max, true).toFixed(LONG_LAT_FRACTION_DIGITS)}`;
 
     return [
       name, description, postData, city, price, previewUrl, urls, isPremium,

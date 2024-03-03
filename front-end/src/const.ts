@@ -19,16 +19,23 @@ export const GOODS = [
   'Fridge',
 ];
 
-export const STARS_COUNT = 5;
-export const MAX_PERCENT_STARS_WIDTH = 100;
+export enum Stars {
+  count = 5,
+  maxWidth = 100
+}
 
-export const URL_MARKER_DEFAULT = 'img/pin.svg';
-export const URL_MARKER_CURRENT = 'img/pin-active.svg';
+export enum UrlMaker {
+  default = 'img/pin.svg',
+  current = 'img/pin-active.svg'
+}
+
+export enum CommentsConstraint {
+  max = 10,
+  minContentLength = 50,
+  maxContentLength = 300,
+}
+
 export const ZOOM = 13;
-
-export const MAX_COMMENTS = 10;
-export const MIN_COMMENT_LENGTH = 50;
-export const MAX_COMMENT_LENGTH = 300;
 
 export enum AppRoute {
   Root = '/',

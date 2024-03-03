@@ -6,6 +6,7 @@ import { TsvOfferGenerator } from '../../shared/libs/offers-generator/index.js';
 import { TSVFileWriter } from '../../shared/libs/file-writer/index.js';
 import { inject, injectable } from 'inversify';
 import { ILogger } from '../../shared/libs/logger/index.js';
+import { PRICE_RADIX } from '../../shared/utils/index.js';
 
 @injectable()
 export class GenerateCommand implements Command {
@@ -46,7 +47,7 @@ export class GenerateCommand implements Command {
     if (!count || !filepath || !url) {
       throw Error('Arguments have not been passed!');
     } else {
-      const offersCount = Number.parseInt(count, 10);
+      const offersCount = Number.parseInt(count, PRICE_RADIX);
       try {
         await this.fetch(url);
         await this.write(filepath, offersCount);
